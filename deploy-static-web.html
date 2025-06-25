@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hướng dẫn Triển khai Trang HTML Tĩnh lên Vercel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* Màu nền xám nhạt */
+        }
+        .container {
+            max-width: 960px;
+        }
+        .card {
+            background-color: #ffffff;
+            border-radius: 0.75rem; /* rounded-xl */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-md */
+            padding: 1.5rem; /* p-6 */
+        }
+        .step-number {
+            background-color: #4f46e5; /* indigo-600 */
+            color: #ffffff;
+            width: 2.5rem; /* w-10 */
+            height: 2.5rem; /* h-10 */
+            border-radius: 9999px; /* rounded-full */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700; /* font-bold */
+            flex-shrink: 0;
+        }
+        .code-block {
+            background-color: #1f2937; /* gray-800 */
+            color: #e5e7eb; /* gray-200 */
+            border-radius: 0.5rem; /* rounded-lg */
+            padding: 1rem; /* p-4 */
+            font-family: monospace;
+            overflow-x: auto;
+        }
+        .image-placeholder {
+            background-color: #e2e8f0; /* gray-300 */
+            border: 2px dashed #94a3b8; /* slate-400 */
+            color: #475569; /* slate-700 */
+            padding: 1.5rem;
+            text-align: center;
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-6 md:p-8">
+    <div class="container mx-auto mt-8 p-4 bg-white rounded-xl shadow-lg">
+        <h1 class="text-3xl sm:text-4xl font-bold text-center text-gray-800 mb-8">Hướng dẫn Triển khai Trang HTML Tĩnh lên Vercel</h1>
+
+        <p class="text-lg text-gray-700 mb-6 text-center">Chào mừng bạn! Hướng dẫn này sẽ giúp bạn đưa trang web HTML tĩnh của mình lên mạng một cách dễ dàng bằng Vercel, sử dụng GitHub để quản lý tệp.</p>
+
+        <!-- Bước 1: Chuẩn bị tệp HTML của bạn -->
+        <div class="flex items-start mb-6 card">
+            <div class="step-number mr-4">1</div>
+            <div>
+                <h2 class="text-2xl font-semibold text-gray-800 mb-2">Chuẩn bị Tệp Trang Web của Bạn</h2>
+                <p class="text-gray-700">Hãy đảm bảo rằng tất cả các tệp HTML, CSS, JavaScript và hình ảnh của bạn được đặt gọn gàng trong một thư mục duy nhất trên máy tính của bạn. Tệp HTML chính của bạn nên được đặt tên là <code class="bg-gray-200 p-1 rounded">index.html</code>.</p>
+                <div class="mt-4 border border-gray-200 rounded-lg p-3">
+                    <p class="font-medium text-gray-800 mb-2">Cấu trúc thư mục ví dụ:</p>
+                    <pre class="code-block text-sm">
+my-website/
+├── index.html
+├── css/
+│   └── style.css
+├── js/
+│   └── script.js
+└── images/
+    └── logo.png
+                    </pre>
+                </div>
+                <div class="image-placeholder">
+                    [Cấu trúc thư mục ví dụ trên máy tính của bạn]
+                </div>
+            </div>
+        </div>
+
+        <!-- Bước 2: Tải lên tệp của bạn lên GitHub -->
+        <div class="flex items-start mb-6 card">
+            <div class="step-number mr-4">2</div>
+            <div>
+                <h2 class="text-2xl font-semibold text-gray-800 mb-2">Tải lên Tệp của Bạn lên GitHub</h2>
+                <p class="text-gray-700 mb-4">Vercel hoạt động tốt nhất khi được kết nối với một kho lưu trữ Git (như GitHub). Chúng ta sẽ tạo một kho lưu trữ mới và tải tệp lên trực tiếp qua giao diện web của GitHub.</p>
+
+                <h3 class="text-xl font-medium text-gray-800 mb-2">2.1. Tạo Kho lưu trữ (Repository) mới trên GitHub</h3>
+                <ol class="list-decimal list-inside text-gray-700 ml-4 mb-4">
+                    <li class="mb-2">Truy cập <a href="https://github.com/" target="_blank" class="text-indigo-600 hover:underline">GitHub.com</a> và đăng nhập vào tài khoản của bạn (hoặc đăng ký nếu chưa có).</li>
+                    <div class="image-placeholder">
+                        [Trang đăng nhập/đăng ký GitHub]
+                    </div>
+                    <li class="mb-2">Trên trang chủ GitHub của bạn, tìm nút <span class="font-bold">"New"</span> (hoặc biểu tượng <span class="font-bold">+</span> ở góc trên bên phải, sau đó chọn <span class="font-bold">"New repository"</span>).</li>
+                    <div class="image-placeholder">
+                        [Nút "New" hoặc biểu tượng "+" trên GitHub]
+                    </div>
+                    <li>Điền thông tin cho kho lưu trữ của bạn:
+                        <ul class="list-disc list-inside text-gray-600 ml-6 mt-2">
+                            <li><span class="font-bold">Repository name:</span> Đặt một tên có ý nghĩa (ví dụ: <code>my-static-website</code>, <code>personal-portfolio</code>).</li>
+                            <li><span class="font-bold">Description</span> (tùy chọn): Mô tả ngắn gọn về dự án của bạn.</li>
+                            <li>Chọn <span class="font-bold">Public</span> hoặc <span class="font-bold">Private</span> tùy theo ý muốn của bạn.</li>
+                            <li>Tích chọn <span class="font-bold">"Add a README file"</span> (được khuyến nghị).</li>
+                        </ul>
+                    </li>
+                    <div class="image-placeholder">
+                        [Trang tạo kho lưu trữ mới trên GitHub với các trường thông tin]
+                    </div>
+                    <li class="mt-2">Nhấn nút <span class="font-bold">"Create repository"</span>.</li>
+                </ol>
+
+                <h3 class="text-xl font-medium text-gray-800 mb-2">2.2. Tải tệp lên Kho lưu trữ của bạn</h3>
+                <ol class="list-decimal list-inside text-gray-700 ml-4">
+                    <li class="mb-2">Sau khi tạo kho lưu trữ, bạn sẽ được chuyển đến trang kho lưu trữ của mình.</li>
+                    <li class="mb-2">Tìm nút <span class="font-bold">"Add file"</span> và chọn <span class="font-bold">"Upload files"</span> từ menu thả xuống.</li>
+                    <div class="image-placeholder">
+                        [Nút "Add file" và tùy chọn "Upload files" trên trang kho lưu trữ GitHub]
+                    </div>
+                    <li class="mb-2">Kéo và thả toàn bộ thư mục trang web của bạn (hoặc chọn từng tệp) vào khu vực tải lên. Đảm bảo bạn tải lên tất cả các tệp và thư mục con (như `css`, `js`, `images`).</li>
+                    <div class="image-placeholder">
+                        [Khu vực kéo và thả tệp trên GitHub]
+                    </div>
+                    <li>Sau khi tất cả các tệp đã được tải lên, cuộn xuống dưới cùng. Trong phần <span class="font-bold">"Commit changes"</span>:
+                        <ul class="list-disc list-inside text-gray-600 ml-6 mt-2">
+                            <li>Thêm một tin nhắn cam kết (ví dụ: <code>"Initial website upload"</code>).</li>
+                            <li>Nhấn nút <span class="font-bold">"Commit changes"</span>.</li>
+                        </ul>
+                    </li>
+                    <div class="image-placeholder">
+                        [Phần "Commit changes" trên GitHub]
+                    </div>
+                    <li class="mt-2">Bây giờ, tất cả các tệp trang web của bạn đã nằm trên GitHub!</li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Bước 3: Triển khai trang web của bạn lên Vercel -->
+        <div class="flex items-start mb-6 card">
+            <div class="step-number mr-4">3</div>
+            <div>
+                <h2 class="text-2xl font-semibold text-gray-800 mb-2">Triển khai Trang web của Bạn lên Vercel</h2>
+                <p class="text-gray-700 mb-4">Bây giờ, chúng ta sẽ kết nối Vercel với kho lưu trữ GitHub của bạn và triển khai trang web.</p>
+
+                <ol class="list-decimal list-inside text-gray-700 ml-4">
+                    <li class="mb-2">Truy cập <a href="https://vercel.com/" target="_blank" class="text-indigo-600 hover:underline">Vercel.com</a>.</li>
+                    <div class="image-placeholder">
+                        [Trang chủ Vercel]
+                    </div>
+                    <li class="mb-2">Đăng nhập vào tài khoản Vercel của bạn. Nếu bạn chưa có, hãy nhấp vào <span class="font-bold">"Sign Up"</span> và chọn đăng ký bằng tài khoản GitHub của bạn. Điều này sẽ giúp quá trình kết nối dễ dàng hơn rất nhiều.</li>
+                    <div class="image-placeholder">
+                        [Trang đăng nhập/đăng ký Vercel với tùy chọn GitHub]
+                    </div>
+                    <li class="mb-2">Sau khi đăng nhập, trên Bảng điều khiển Vercel của bạn, tìm và nhấp vào nút <span class="font-bold">"Add New..."</span> (hoặc <span class="font-bold">"New Project"</span> ở góc trên bên phải).</li>
+                    <div class="image-placeholder">
+                        [Nút "Add New..." hoặc "New Project" trên Bảng điều khiển Vercel]
+                    </div>
+                    <li class="mb-2">Trong phần <span class="font-bold">"Import Git Repository"</span>, Vercel sẽ hiển thị danh sách các kho lưu trữ từ nhà cung cấp Git mà bạn đã kết nối.</li>
+                    <li class="mb-2">Tìm kho lưu trữ GitHub chứa các tệp HTML tĩnh của bạn (tên bạn đã đặt ở Bước 2.1) và nhấp vào nút <span class="font-bold">"Import"</span> bên cạnh nó.
+                        <ul class="list-disc list-inside text-gray-600 ml-6 mt-2">
+                            <li>Nếu bạn không thấy kho lưu trữ của mình, bạn có thể cần nhấp vào <span class="font-bold">"Configure GitHub App"</span> để cấp quyền truy cập cho Vercel vào kho lưu trữ đó (hoặc tất cả các kho lưu trữ của bạn).</li>
+                        </ul>
+                    </li>
+                    <div class="image-placeholder">
+                        [Danh sách kho lưu trữ trên Vercel và nút "Import"]
+                    </div>
+                    <li class="mb-2">Trên trang <span class="font-bold">"Configure Project"</span>:
+                        <ul class="list-disc list-inside text-gray-600 ml-6 mt-2">
+                            <li><span class="font-bold">Project Name:</span> Vercel sẽ đề xuất một tên dự án dựa trên tên kho lưu trữ của bạn. Bạn có thể thay đổi nếu muốn.</li>
+                            <li><span class="font-bold">Root Directory:</span> Nếu tệp <code>index.html</code> của bạn (và các tệp tĩnh khác) nằm ở thư mục gốc của kho lưu trữ, hãy để mặc định là <code>./</code>. Nếu chúng nằm trong một thư mục con (ví dụ: <code>public</code>, <code>dist</code>), hãy chỉ định tên thư mục đó ở đây.</li>
+                            <li><span class="font-bold">Build & Output Settings:</span> Đối với một trang HTML tĩnh đơn giản, Vercel thường sẽ tự động phát hiện mọi thứ chính xác. Bạn thường không cần thay đổi bất kỳ cài đặt nào ở đây. "Framework Preset" có thể là "Other" hoặc "Static".</li>
+                        </ul>
+                    </li>
+                    <div class="image-placeholder">
+                        [Trang "Configure Project" trên Vercel với các cài đặt]
+                    </div>
+                    <li class="mb-2">Nhấn nút <span class="font-bold">"Deploy"</span>.</li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Bước 4: Trang web của bạn đã hoạt động! -->
+        <div class="flex items-start card">
+            <div class="step-number mr-4">4</div>
+            <div>
+                <h2 class="text-2xl font-semibold text-gray-800 mb-2">Trang web của Bạn đã Hoạt động!</h2>
+                <p class="text-gray-700 mb-4">Vercel sẽ bắt đầu xây dựng và triển khai dự án của bạn. Quá trình này thường chỉ mất vài giây đối với HTML tĩnh.</p>
+                <div class="image-placeholder">
+                    [Quá trình triển khai trên Vercel]
+                </div>
+                <p class="text-gray-700 mb-4">Khi hoàn tất, bạn sẽ thấy thông báo <span class="font-bold">"Congratulations!"</span> và nút <span class="font-bold">"Visit"</span>.</p>
+                <div class="image-placeholder">
+                    [Thông báo "Congratulations!" và nút "Visit" sau khi triển khai thành công]
+                </div>
+                <p class="text-gray-700">Nhấp vào nút <span class="font-bold">"Visit"</span> để xem trang web HTML tĩnh của bạn đang hoạt động trên một tên miền <code>.vercel.app</code> (ví dụ: <code>your-project-name.vercel.app</code>).</p>
+                <div class="image-placeholder">
+                    [Trang web đã được triển khai trên tên miền Vercel]
+                </div>
+                <p class="text-gray-700 mt-4">Vercel cũng cung cấp một URL xem trước duy nhất cho mỗi lần triển khai mới, điều này rất hữu ích để chia sẻ các thay đổi trước khi đưa chúng vào sản phẩm chính thức.</p>
+                <p class="text-gray-700 mt-4 font-semibold">Bây giờ, bất cứ khi nào bạn đẩy các thay đổi mới lên kho lưu trữ GitHub đã kết nối của mình, Vercel sẽ tự động triển khai lại trang web của bạn!</p>
+            </div>
+        </div>
+
+        <p class="text-center text-gray-600 mt-8">Chúc mừng! Bạn đã triển khai thành công trang web HTML tĩnh của mình lên Vercel.</p>
+    </div>
+</body>
+</html>
