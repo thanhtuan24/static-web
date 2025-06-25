@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bài Test Sắc Hương Tự Do</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #000; color: #fff; padding: 20px; }
+    h1 { color: #FFD700; }
+    label { display: block; margin: 10px 0 5px; }
+    select, button { width: 100%; padding: 8px; margin-bottom: 20px; }
+    .result { background: #222; padding: 20px; margin-top: 20px; border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <h1>Bài Test Sắc Hương Tự Do</h1>
+
+  <form id="freedomTest">
+    <label>Sở hữu không gian</label>
+    <select id="space">
+      <option value="1">Bờ biển vô cực</option>
+      <option value="2">Đồi núi trùng điệp</option>
+      <option value="3">Dưới nước</option>
+      <option value="4">Sân vườn</option>
+      <option value="5">Một góc căn phòng</option>
+    </select>
+
+    <label>Chuyển động thần thái</label>
+    <select id="motion">
+      <option value="1">Đang bước đi</option>
+      <option value="2">Ngồi uống cốc cà phê</option>
+      <option value="3">Thả lỏng cơ thể</option>
+      <option value="4">Nhảy phiêu cùng nhạc</option>
+      <option value="5">Ăn gì đó thật ngon</option>
+    </select>
+
+    <label>Nốt hương dấu ấn</label>
+    <select id="scent">
+      <option value="1">Hương Vanilla</option>
+      <option value="2">Hương Lavender</option>
+      <option value="3">Hương hoa trắng</option>
+      <option value="4">Hương gỗ</option>
+      <option value="5">Hương cam chanh</option>
+    </select>
+
+    <label>Biểu tượng thời thượng</label>
+    <select id="symbol">
+      <option value="1">Ngọn lửa nhiệt huyết</option>
+      <option value="2">Dòng nước dịu êm</option>
+      <option value="3">Ánh vàng hoàng hôn</option>
+      <option value="4">Trang sức cá tính</option>
+      <option value="5">Nước hoa YSL</option>
+    </select>
+
+    <button type="button" onclick="getResult()">Xem kết quả</button>
+  </form>
+
+  <div id="result" class="result" style="display: none;"></div>
+
+  <script>
+    function getResult() {
+      const s = document.getElementById("space").value;
+      const m = document.getElementById("motion").value;
+      const n = document.getElementById("scent").value;
+      const b = document.getElementById("symbol").value;
+
+      const resultMap = {
+        "1": {
+          title: "SẮC HƯƠNG TỰ DO KIÊU HÃNH",
+          desc: "Tự tin chiếm trọn spotlight với tinh thần cháy bỏng, cuốn hút."
+        },
+        "2": {
+          title: "SẮC HƯƠNG TỰ DO AN NHIÊN",
+          desc: "Bình yên và tự tại chính là phong cách sống bạn chọn."
+        },
+        "3": {
+          title: "SẮC HƯƠNG TỰ DO PHÓNG KHOÁNG",
+          desc: "Bạn là luồng gió mới – nhẹ nhàng, vui tươi và tràn đầy năng lượng."
+        },
+        "4": {
+          title: "SẮC HƯƠNG TỰ DO RỰC LỬA",
+          desc: "Sống hết mình với từng khoảnh khắc, bạn luôn mang màu sắc mãnh liệt."
+        },
+        "5": {
+          title: "SẮC HƯƠNG TỰ DO BIỂU TƯỢNG",
+          desc: "Cá tính – đẳng cấp – khác biệt, bạn là dấu ấn khó phai."
+        }
+      };
+
+      const score = [s, m, n, b];
+      const counts = {};
+      score.forEach(i => counts[i] = (counts[i] || 0) + 1);
+
+      const max = Object.entries(counts).sort((a,b) => b[1] - a[1])[0][0];
+      const r = resultMap[max];
+
+      document.getElementById("result").style.display = "block";
+      document.getElementById("result").innerHTML = `<h2>${r.title}</h2><p>${r.desc}</p>`;
+    }
+  </script>
+</body>
+</html>
