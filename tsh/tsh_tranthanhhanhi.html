@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Khám Phá Thần Số Học: Bé Trần Thanh Hạ Nhi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Chosen Palette: Calm Harmony -->
+    <!-- Application Structure Plan: Tôi đã thiết kế ứng dụng theo cấu trúc dashboard-style với thanh điều hướng bên cạnh (chuyển lên trên ở màn hình nhỏ) để người dùng có thể truy cập ngay lập tức vào phần họ quan tâm. Cấu trúc này phá vỡ tính tuyến tính của báo cáo gốc, biến việc đọc thành một hành trình khám phá tương tác. Các phần chính bao gồm: 1. Tổng quan với các thẻ chỉ số chính. 2. Phân tích sâu các chỉ số cốt lõi qua các thẻ có thể lật mở. 3. Biểu đồ ngày sinh được trực quan hóa bằng lưới và biểu đồ cột tương tác. 4. Hành trình 4 chặng được thể hiện qua một dòng thời gian trực quan. 5. Tổng hợp và Định hướng được tổ chức trong các tab. Cấu trúc này được chọn vì nó giúp chia nhỏ lượng thông tin lớn, tăng tính tương tác và giúp người dùng (cha mẹ) dễ dàng tiêu hóa và tham chiếu thông tin theo từng chủ đề cụ thể một cách hiệu quả nhất. -->
+    <!-- Visualization & Content Choices: 1. Các chỉ số cốt lõi: Thông tin -> Mục tiêu: Inform/Compare -> Trình bày: Thẻ thông số (stat cards) có thể nhấp để mở rộng -> Tương tác: Click -> Lý do: Trình bày thông tin cốt lõi một cách ngắn gọn, cho phép người dùng khám phá sâu hơn khi cần, tránh quá tải thông tin. 2. Phân bố số ngày sinh: Thông tin -> Mục tiêu: Inform -> Trình bày: Biểu đồ cột (Chart.js/Canvas) -> Tương tác: Hover để xem chi tiết -> Lý do: Trực quan hóa tần suất xuất hiện của các con số một cách rõ ràng. 3. Biểu đồ Ngày sinh & Mũi tên trống: Thông tin -> Mục tiêu: Organize/Inform -> Trình bày: Lưới HTML/CSS -> Tương tác: Hover/Click vào các mũi tên trống để xem luận giải -> Lý do: Biến một khái niệm trừu tượng thành một sơ đồ tương tác, dễ hiểu. 4. 4 Chặng đường đời: Thông tin -> Mục tiêu: Change -> Trình bày: Dòng thời gian (timeline) HTML/CSS/JS -> Tương tác: Click vào từng chặng để đọc phân tích -> Lý do: Thể hiện tiến trình cuộc đời một cách trực quan, giúp người dùng dễ theo dõi các giai đoạn. Các lựa chọn này đều tuân thủ yêu cầu, sử dụng Canvas và các yếu tố HTML/CSS/JS để tạo ra trải nghiệm tương tác, dễ hiểu từ nội dung báo cáo. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <style>
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background-color: #f8fafc; /* slate-50 */
+        }
+        .nav-item {
+            transition: all 0.3s ease;
+        }
+        .nav-item.active {
+            background-color: #4f46e5; /* indigo-600 */
+            color: white;
+            transform: scale(1.05);
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+        .pinnacle-item.active .pinnacle-content {
+            max-height: 500px;
+            opacity: 1;
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+        }
+    </style>
+</head>
+<body class="text-slate-700">
+
+    <div class="min-h-screen lg:flex">
+        <!-- Sidebar Navigation -->
+        <aside id="sidebar" class="bg-white lg:w-64 w-full p-4 lg:p-6 shadow-lg lg:min-h-screen lg:sticky lg:top-0">
+            <div class="text-center mb-8">
+                <h1 class="text-2xl font-bold text-indigo-600">Thần số học</h1>
+                <p class="text-sm text-slate-500">Bé Trần Thanh Hạ Nhi</p>
+            </div>
+            <nav id="nav-menu" class="flex lg:flex-col flex-wrap justify-center gap-2">
+                <a href="#tong-quan" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-indigo-100 font-semibold">
+                    <span class="text-xl">🔮</span> Tổng quan
+                </a>
+                <a href="#chi-so-cot-loi" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-indigo-100 font-semibold">
+                    <span class="text-xl">🔑</span> Chỉ số Cốt lõi
+                </a>
+                <a href="#bieu-do-ngay-sinh" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-indigo-100 font-semibold">
+                    <span class="text-xl">🔢</span> Biểu đồ Ngày sinh
+                </a>
+                <a href="#hanh-trinh-4-chang" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-indigo-100 font-semibold">
+                    <span class="text-xl">🗺️</span> Hành trình 4 Chặng
+                </a>
+                <a href="#dinh-huong-phat-trien" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-indigo-100 font-semibold">
+                    <span class="text-xl">🌱</span> Định hướng Phát triển
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-4 sm:p-6 lg:p-10">
+            <!-- Section 1: Tổng quan -->
+            <section id="tong-quan" class="content-section">
+                <div class="text-center p-8 bg-gradient-to-br from-indigo-500 to-violet-500 rounded-2xl shadow-2xl text-white mb-10">
+                    <h2 class="text-4xl font-bold mb-2">Trần Thanh Hạ Nhi</h2>
+                    <p class="text-lg opacity-90">Ngày sinh: 22/05/2025</p>
+                    <div class="mt-6">
+                        <p class="text-lg">Con số Đường đời</p>
+                        <p class="text-8xl font-bold tracking-tighter">9</p>
+                        <p class="mt-2 text-violet-200 max-w-2xl mx-auto">Con đường của lòng nhân ái, lý tưởng cao cả và trách nhiệm với cộng đồng.</p>
+                    </div>
+                </div>
+                
+                <h3 class="text-2xl font-bold text-slate-800 mb-6 text-center">Bản giao hưởng các con số</h3>
+                 <p class="max-w-3xl mx-auto text-center text-slate-600 mb-10">Mỗi chỉ số là một nốt nhạc, cùng nhau tạo nên bản giao hưởng độc đáo trong cuộc đời của bé. Khám phá từng nốt nhạc để thấu hiểu sâu sắc hơn về hành trình phía trước.</p>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- Stat Card: Sứ mệnh -->
+                    <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-violet-500">
+                        <p class="text-sm text-slate-500 font-semibold">Chỉ số Sứ mệnh</p>
+                        <p class="text-5xl font-bold text-slate-800 mt-2">9</p>
+                        <p class="mt-2 text-sm">Cống hiến cho cộng đồng và lan tỏa giá trị tốt đẹp.</p>
+                    </div>
+                    <!-- Stat Card: Linh hồn -->
+                    <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-rose-400">
+                        <p class="text-sm text-slate-500 font-semibold">Chỉ số Linh hồn</p>
+                        <p class="text-5xl font-bold text-slate-800 mt-2">3</p>
+                        <p class="mt-2 text-sm">Khát vọng thể hiện, sáng tạo và lan tỏa niềm vui.</p>
+                    </div>
+                    <!-- Stat Card: Nhân cách -->
+                    <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-teal-400">
+                        <p class="text-sm text-slate-500 font-semibold">Chỉ số Nhân cách</p>
+                        <p class="text-5xl font-bold text-slate-800 mt-2">6</p>
+                        <p class="mt-2 text-sm">Vẻ ngoài ấm áp, đáng tin cậy và có trách nhiệm.</p>
+                    </div>
+                    <!-- Stat Card: Thái độ -->
+                    <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-amber-400">
+                        <p class="text-sm text-slate-500 font-semibold">Chỉ số Thái độ</p>
+                        <p class="text-5xl font-bold text-slate-800 mt-2">9</p>
+                        <p class="mt-2 text-sm">Cái nhìn sâu sắc, bao dung và đầy lòng trắc ẩn.</p>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Section 2: Chỉ số Cốt lõi -->
+            <section id="chi-so-cot-loi" class="content-section space-y-8">
+                <h2 class="text-3xl font-bold text-slate-800 text-center mb-2">Giải mã các Chỉ số Cốt lõi</h2>
+                <p class="max-w-3xl mx-auto text-center text-slate-600 mb-10">Nhấp vào từng chỉ số để khám phá sâu hơn về những năng lượng định hình nên tính cách và con đường phát triển của bé.</p>
+
+                <div id="core-numbers-container" class="space-y-6"></div>
+            </section>
+
+            <!-- Section 3: Biểu đồ Ngày sinh -->
+            <section id="bieu-do-ngay-sinh" class="content-section">
+                <h2 class="text-3xl font-bold text-slate-800 text-center mb-2">Biểu đồ Ngày sinh: 22/05/2025</h2>
+                <p class="max-w-3xl mx-auto text-center text-slate-600 mb-10">Biểu đồ ngày sinh là bản đồ năng lượng bẩm sinh, cho thấy những điểm mạnh và những lĩnh vực cần nỗ lực rèn luyện để bé phát triển một cách cân bằng và toàn diện.</p>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
+                    <div>
+                        <h3 class="font-bold text-xl mb-4 text-center text-slate-800">Phân bố Năng lượng Bẩm sinh</h3>
+                        <div class="bg-white p-6 rounded-xl shadow-lg">
+                             <div class="chart-container relative h-80 md:h-96 w-full max-w-md mx-auto">
+                                <canvas id="birthChartDistribution"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <h3 class="font-bold text-xl mb-4 text-center text-slate-800">Lưới Năng lượng & Mũi tên trống</h3>
+                        <div class="grid grid-cols-3 gap-2 w-64 h-64 shadow-2xl bg-white p-4 rounded-2xl">
+                            <!-- Row 3-6-9 -->
+                            <div class="cell bg-slate-100 text-slate-400">3</div>
+                            <div class="cell bg-slate-100 text-slate-400">6</div>
+                            <div class="cell bg-slate-100 text-slate-400">9</div>
+                            <!-- Row 2-5-8 -->
+                            <div class="cell bg-emerald-100 text-emerald-700 font-bold border-2 border-emerald-300">222</div>
+                            <div class="cell bg-sky-100 text-sky-700 font-bold border-2 border-sky-300">55</div>
+                            <div class="cell bg-slate-100 text-slate-400">8</div>
+                            <!-- Row 1-4-7 -->
+                            <div class="cell bg-slate-100 text-slate-400">1</div>
+                            <div class="cell bg-slate-100 text-slate-400">4</div>
+                            <div class="cell bg-slate-100 text-slate-400">7</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="empty-arrows-section" class="mt-12 bg-white p-6 rounded-xl shadow-lg">
+                     <h3 class="text-xl font-bold text-slate-800 mb-6 text-center">Các Mũi tên Trống: Bài học cần Rèn luyện</h3>
+                     <p class="text-center text-slate-600 mb-6">Đây là những lĩnh vực bé cần sự hỗ trợ và định hướng từ gia đình để phát triển và hoàn thiện bản thân. Nhấp vào từng mũi tên để xem luận giải chi tiết.</p>
+                    <div id="empty-arrows-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                </div>
+
+            </section>
+
+            <!-- Section 4: Hành trình 4 Chặng -->
+            <section id="hanh-trinh-4-chang" class="content-section">
+                <h2 class="text-3xl font-bold text-slate-800 text-center mb-2">Hành trình 4 Chặng đường đời</h2>
+                <p class="max-w-3xl mx-auto text-center text-slate-600 mb-12">Cuộc đời được chia thành 4 giai đoạn chính, mỗi giai đoạn mang một bài học và cơ hội riêng. Đây là tấm bản đồ giúp định hướng và chuẩn bị cho tương lai của bé.</p>
+                <div id="pinnacles-timeline" class="space-y-4"></div>
+            </section>
+            
+            <!-- Section 5: Định hướng Phát triển -->
+            <section id="dinh-huong-phat-trien" class="content-section">
+                <h2 class="text-3xl font-bold text-slate-800 text-center mb-10">Tổng hợp & Định hướng Phát triển Toàn diện</h2>
+                <div class="max-w-4xl mx-auto">
+                    <div id="guidance-tabs" class="flex justify-center border-b border-slate-200 mb-6 flex-wrap">
+                        <button data-tab="potentials" class="guidance-tab active px-6 py-3 font-semibold text-slate-500 border-b-2 border-transparent hover:text-indigo-600">Tiềm năng & Sự nghiệp</button>
+                        <button data-tab="challenges" class="guidance-tab px-6 py-3 font-semibold text-slate-500 border-b-2 border-transparent hover:text-indigo-600">Thách thức & Giải pháp</button>
+                        <button data-tab="advice" class="guidance-tab px-6 py-3 font-semibold text-slate-500 border-b-2 border-transparent hover:text-indigo-600">Lời khuyên cho Cha mẹ</button>
+                    </div>
+                    <div id="guidance-content" class="bg-white p-6 sm:p-8 rounded-xl shadow-lg">
+                        <!-- Content will be injected by JS -->
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const data = {
+        coreNumbers: [
+            {
+                number: 9,
+                title: 'Chỉ số Đường đời',
+                subtitle: 'Sứ Giả Của Lòng Nhân Ái Và Lý Tưởng Cao Đẹp',
+                description: 'Con số 9 là biểu tượng của lòng nhân ái, vị tha và trách nhiệm với cộng đồng. Bé có tiềm năng sở hữu trái tim ấm áp, giàu lòng trắc ẩn và có khát khao tạo ra ảnh hưởng tích cực. Đây là con đường của một nhà lãnh đạo truyền cảm hứng bằng chính sự tử tế và tầm nhìn của mình.',
+                strengths: ['Lòng nhân ái bẩm sinh', 'Lý tưởng cao cả', 'Trí tuệ sâu sắc', 'Tiềm năng lãnh đạo'],
+                challenges: ['Dễ bị cảm xúc chi phối', 'Khó cân bằng cho-nhận', 'Kỳ vọng quá cao']
+            },
+            {
+                number: 9,
+                title: 'Chỉ số Sứ mệnh',
+                subtitle: 'Cống Hiến Cho Cộng Đồng Và Lan Tỏa Giá Trị Tốt Đẹp',
+                description: 'Sứ mệnh của bé gắn liền với việc phục vụ nhân loại, cống hiến cho những lý tưởng cao cả. Bé được thôi thúc để trở thành người có lòng trắc ẩn sâu sắc, sự bao dung và tinh thần sẵn sàng cho đi. Sứ mệnh này có thể liên quan đến các lĩnh vực như chữa lành, giáo dục, hoạt động nhân đạo.',
+                strengths: ['Động lực cống hiến mạnh mẽ', 'Tầm nhìn bao quát', 'Khả năng hòa giải', 'Mang lại hy vọng'],
+                challenges: ['Học cách cho đi mà không kiệt sức', 'Cần chữa lành bản thân trước', 'Áp lực từ trách nhiệm lớn']
+            },
+            {
+                number: 3,
+                title: 'Chỉ số Linh hồn',
+                subtitle: 'Khát Vọng Thể Hiện, Sáng Tạo Và Niềm Vui',
+                description: 'Sâu thẳm bên trong, bé khao khát được thể hiện bản thân, sáng tạo và kết nối với mọi người. Bé có một tâm hồn nghệ sĩ, yêu cái đẹp, sự hài hước và lạc quan. Niềm vui và sự bay bổng của Linh hồn 3 sẽ giúp bé thực hiện những lý tưởng lớn lao của số 9 một cách nhẹ nhàng hơn.',
+                strengths: ['Tâm hồn nghệ sĩ', 'Yêu thích giao tiếp', 'Lạc quan, vui vẻ', 'Năng lượng sáng tạo'],
+                challenges: ['Cần được tự do biểu đạt', 'Dễ buồn chán nếu bị gò bó', 'Cần được công nhận']
+            },
+            {
+                number: 6,
+                title: 'Chỉ số Nhân cách',
+                subtitle: 'Vẻ Ngoài Ấm Áp, Trách Nhiệm Và Chu Đáo',
+                description: 'Bé tạo ấn tượng ban đầu là một người rất ấm áp, đáng tin cậy, có trách nhiệm và luôn quan tâm đến người khác. Vẻ ngoài này giúp bé dễ dàng kết nối, tạo thiện cảm và nhận được sự ủng hộ từ mọi người trong hành trình thực hiện những mục tiêu cao cả của mình.',
+                strengths: ['Đáng tin cậy, chu đáo', 'Tạo sự hài hòa', 'Có gu thẩm mỹ', 'Gắn bó với gia đình'],
+                challenges: ['Có xu hướng quá bao bọc', 'Lo lắng thái quá', 'Muốn kiểm soát để mọi thứ ổn thỏa']
+            },
+             {
+                number: 9,
+                title: 'Chỉ số Thái độ',
+                subtitle: 'Cái Nhìn Sâu Sắc Và Tư Duy Sáng Tạo',
+                description: 'Khi đối mặt với các tình huống, phản ứng tự nhiên của bé là cái nhìn bao dung, sâu sắc và đầy lòng trắc ẩn. Bé có khả năng nhìn nhận vấn đề từ nhiều khía cạnh, không vội vàng phán xét mà cố gắng thấu hiểu. Sự nhất quán giữa Thái độ 9 và Đường đời 9 tạo nên một con người chân thật, đáng tin cậy.',
+                strengths: ['Bao dung, không phán xét', 'Tìm kiếm giải pháp hòa giải', 'Trưởng thành trong suy nghĩ', 'Trực giác mạnh'],
+                challenges: ['Dễ tổn thương nếu môi trường không ủng hộ', 'Khó "giả vờ" một thái độ khác']
+            },
+        ],
+        birthChart: {
+            numbersPresent: [
+                { number: 2, count: 3, description: 'Ba số 2 (222) cho thấy mức độ nhạy cảm và trực giác cực kỳ cao. Bé có khả năng thấu cảm sâu sắc nhưng cũng rất dễ bị tổn thương bởi tác động bên ngoài.' },
+                { number: 5, count: 2, description: 'Hai số 5 (55) thể hiện một tình yêu tự do vô cùng mạnh mẽ, khát khao khám phá và trải nghiệm. Tuy nhiên, điều này cũng có thể dẫn đến sự thiếu kiên định.' }
+            ],
+            emptyArrows: [
+                { name: 'Mũi tên 1-4-7', title: 'Thiếu Thực tế', description: 'Do thiếu vắng toàn bộ Trục Thể chất, bé có thể gặp khó khăn trong việc tổ chức, thiếu tính thực tế và kiên nhẫn. Cần rèn luyện tính kỷ luật và khả năng tập trung vào mục tiêu cụ thể.' },
+                { name: 'Mũi tên 3-6-9', title: 'Thiếu Sáng tạo Trí tuệ', description: 'Sự thiếu vắng Trục Trí não cho thấy bé cần được kích hoạt và rèn luyện nhiều hơn ở khía cạnh tư duy logic, phân tích và biểu đạt ý tưởng một cách cụ thể.' },
+                { name: 'Mũi tên 7-8-9', title: 'Thiếu Hành động (Thụ động)', description: 'Đây là một thách thức lớn. Bé có thể có xu hướng thụ động, trì hoãn và thiếu động lực để biến ý tưởng thành hành động. Cần sự khích lệ liên tục để bé mạnh dạn hơn.' },
+                { name: 'Mũi tên 1-2-3', title: 'Thiếu Kế hoạch', description: 'Bé có thể không giỏi trong việc lập kế hoạch chi tiết và dài hạn. Cần dạy bé kỹ năng sắp xếp công việc và suy nghĩ trước khi hành động.' },
+                { name: 'Mũi tên 4-5-6', title: 'Thiếu Ý chí', description: 'Bé có thể thiếu sự kiên định, dễ thay đổi mục tiêu hoặc nhanh bỏ cuộc khi gặp khó khăn. Cần rèn luyện tính kiên trì, nhẫn nại.' },
+                { name: 'Mũi tên 2-5-8', title: 'Nhạy cảm / Dễ tổn thương', description: 'Sự thiếu vắng số 8 càng nhấn mạnh mức độ nhạy cảm cao của bé. Cần giúp bé xây dựng sự tự tin và vững vàng hơn về mặt tinh thần.' },
+            ]
+        },
+        pinnacles: [
+            { number: '9', age: '0 - 27', title: 'Gieo mầm Lý tưởng & Lòng nhân ái', description: 'Giai đoạn quan trọng để hình thành nhân cách, học về lòng vị tha, trách nhiệm và theo đuổi lý tưởng. Bé cần xây dựng nền tảng đạo đức vững chắc và học cách cân bằng giữa việc cho đi và chăm sóc bản thân.' },
+            { number: '13/4', age: '28 - 36', title: 'Xây dựng nền tảng & Bài học Chăm chỉ', karmic: true, description: 'Giai đoạn tập trung xây dựng sự ổn định, đòi hỏi sự chăm chỉ, kỷ luật cao. Nợ nghiệp 13/4 mang đến thử thách đòi hỏi nỗ lực vượt bậc để vượt qua xu hướng lười biếng hoặc thiếu trách nhiệm từ tiền kiếp.' },
+            { number: '13/4', age: '37 - 45', title: 'Củng cố thành quả & Trách nhiệm', karmic: true, description: 'Tiếp tục bài học về sự chăm chỉ và trách nhiệm ở mức độ sâu sắc hơn. Đây là cơ hội để củng cố thành tựu và đạt được sự ổn định bền vững. Sự nỗ lực bền bỉ sẽ mang lại phần thưởng xứng đáng.' },
+            { number: '14/5', age: '46+', title: 'Khám phá Tự do & Bài học Cân bằng', karmic: true, description: 'Giai đoạn của sự thay đổi, khám phá và mở rộng trải nghiệm. Nợ nghiệp 14/5 là bài học về việc sử dụng tự do một cách có ý thức, trách nhiệm, tránh lạm dụng và học cách cam kết.' }
+        ],
+        guidance: {
+            potentials: {
+                title: 'Tiềm năng Vượt trội và Định hướng Sự nghiệp',
+                content: `
+                    <p class="mb-4">Với sự kết hợp độc đáo của các năng lượng chủ đạo, bé Nhi có tiềm năng phát triển vượt trội trong nhiều lĩnh vực mang tính nhân văn, sáng tạo và cống hiến cho cộng đồng:</p>
+                    <ul class="list-disc list-inside space-y-2 text-slate-600">
+                        <li><strong>Nhân văn & Xã hội:</strong> Nhà hoạt động xã hội, cố vấn tâm lý, nhà từ thiện, nhà ngoại giao.</li>
+                        <li><strong>Giáo dục & Truyền cảm hứng:</strong> Giáo viên, giảng viên xuất sắc, diễn giả có sức lay động lòng người.</li>
+                        <li><strong>Nghệ thuật & Sáng tạo:</strong> Nhà văn, nhạc sĩ, họa sĩ, diễn viên - dùng tài năng để truyền tải thông điệp nhân văn.</li>
+                        <li><strong>Lãnh đạo:</strong> Nhà lãnh đạo trong các tổ chức phi lợi nhuận, dự án cộng đồng, nơi cần tầm nhìn và lòng trắc ẩn.</li>
+                        <li><strong>Chăm sóc & Chữa lành:</strong> Các ngành nghề liên quan đến y tế, trị liệu, chăm sóc sức khỏe cộng đồng.</li>
+                    </ul>
+                `
+            },
+            challenges: {
+                title: 'Thách thức Chính và Giải pháp Hỗ trợ',
+                content: `
+                    <p class="mb-4">Bên cạnh tiềm năng to lớn, bé cũng đối mặt với những thách thức cần được nhận diện và hỗ trợ kịp thời:</p>
+                    <ul class="list-disc list-inside space-y-3 text-slate-600">
+                        <li><strong>Vượt qua sự thụ động (Nhiều mũi tên trống):</strong> Đây là thách thức lớn nhất. Cần khuyến khích tính tự lập, chủ động, tham gia các hoạt động thể chất và trải nghiệm thực tế để tăng cường sự mạnh dạn hành động.</li>
+                        <li><strong>Đối mặt Nợ nghiệp (13/4 & 14/5):</strong> Cần dạy bé về giá trị của lao động chăm chỉ, tính kỷ luật, và sự cam kết ngay từ nhỏ. Giúp bé hiểu thử thách là cơ hội để trưởng thành.</li>
+                        <li><strong>Cân bằng cảm xúc & sự nhạy cảm:</strong> Với sự nhạy cảm cao, bé cần học cách nhận diện, quản lý cảm xúc một cách lành mạnh. Gia đình cần tạo không gian an toàn để bé thể hiện cảm xúc mà không bị phán xét.</li>
+                    </ul>
+                `
+            },
+            advice: {
+                title: 'Lời khuyên cho Cha mẹ',
+                content: `
+                    <p class="mb-4">Vai trò của gia đình là vô cùng quan trọng trong việc giúp bé phát huy tối đa tiềm năng và vượt qua thách thức. Một môi trường phát triển lý tưởng cần:</p>
+                    <ul class="list-disc list-inside space-y-3 text-slate-600">
+                        <li><strong>Giàu tình yêu thương và sự khích lệ:</strong> Đây là nền tảng quan trọng nhất, giúp bé cảm thấy an toàn và tự tin.</li>
+                        <li><strong>Khuyến khích sáng tạo & tự do biểu đạt:</strong> Cho bé tiếp xúc với nghệ thuật, âm nhạc, cho phép bé tự do thể hiện ý tưởng, cảm xúc.</li>
+                        <li><strong>Đề cao các giá trị nhân văn:</strong> Sống và làm gương cho bé về sự sẻ chia, giúp đỡ người khác, quan tâm đến các vấn đề xã hội.</li>
+                        <li><strong>Rèn luyện kỷ luật và kiên trì:</strong> Thực hiện một cách nhất quán nhưng mềm dẻo, không áp đặt, giúp bé hình thành thói quen tốt.</li>
+                        <li><strong>Tạo điều kiện cho hoạt động ngoại khóa đa dạng:</strong> Giúp bé khám phá thêm tiềm năng, phát triển các kỹ năng còn thiếu và mở rộng quan hệ xã hội.</li>
+                    </ul>
+                `
+            }
+        }
+    };
+    
+    // --- RENDER FUNCTIONS ---
+
+    function renderCoreNumbers() {
+        const container = document.getElementById('core-numbers-container');
+        container.innerHTML = data.coreNumbers.map((item, index) => `
+            <div class="core-number-card bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-500">
+                <button class="w-full text-left p-6 flex items-center gap-6" onclick="toggleCard(this)">
+                    <div class="flex-shrink-0 w-16 h-16 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-4xl font-bold">${item.number}</div>
+                    <div class="flex-1">
+                        <h3 class="text-xl font-bold text-slate-800">${item.title}</h3>
+                        <p class="text-slate-500">${item.subtitle}</p>
+                    </div>
+                     <div class="transform transition-transform duration-300 text-indigo-500 text-2xl">➔</div>
+                </button>
+                <div class="card-content max-h-0 opacity-0 overflow-hidden transition-all duration-500 px-6">
+                    <p class="text-slate-600 mb-4">${item.description}</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pb-6">
+                        <div>
+                            <h4 class="font-semibold text-green-600 mb-2">Điểm mạnh:</h4>
+                            <ul class="list-disc list-inside text-sm space-y-1">${item.strengths.map(s => `<li>${s}</li>`).join('')}</ul>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-red-600 mb-2">Thách thức:</h4>
+                            <ul class="list-disc list-inside text-sm space-y-1">${item.challenges.map(c => `<li>${c}</li>`).join('')}</ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function renderBirthChart() {
+        const ctx = document.getElementById('birthChartDistribution').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: data.birthChart.numbersPresent.map(item => `Số ${item.number}`),
+                datasets: [{
+                    label: 'Số lần xuất hiện',
+                    data: data.birthChart.numbersPresent.map(item => item.count),
+                    backgroundColor: [
+                        'rgba(165, 180, 252, 0.6)', // indigo-300
+                        'rgba(125, 211, 252, 0.6)', // sky-300
+                    ],
+                    borderColor: [
+                        'rgba(99, 102, 241, 1)', // indigo-500
+                        'rgba(56, 189, 248, 1)', // sky-500
+                    ],
+                    borderWidth: 2,
+                    borderRadius: 8,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            afterBody: function(context) {
+                                const index = context[0].dataIndex;
+                                return data.birthChart.numbersPresent[index].description;
+                            }
+                        },
+                        bodyFont: { size: 12 },
+                        padding: 10,
+                        boxPadding: 4,
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                           stepSize: 1
+                        }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+
+        const emptyArrowsContainer = document.getElementById('empty-arrows-container');
+        emptyArrowsContainer.innerHTML = data.birthChart.emptyArrows.map(arrow => `
+            <div class="arrow-card p-4 bg-slate-50 rounded-lg cursor-pointer hover:bg-slate-100 hover:shadow-md transition-all" onclick="showArrowDetails(this)">
+                <h4 class="font-bold text-slate-700">${arrow.name}</h4>
+                <p class="text-sm text-red-500">${arrow.title}</p>
+                <div class="arrow-details hidden mt-2 text-sm text-slate-600">
+                    ${arrow.description}
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function renderPinnacles() {
+        const container = document.getElementById('pinnacles-timeline');
+        container.innerHTML = data.pinnacles.map((pinnacle, index) => `
+            <div class="pinnacle-item relative pl-12 transition-all duration-500">
+                <div class="absolute left-4 top-2 w-8 h-8 rounded-full flex items-center justify-center font-bold text-white ${pinnacle.karmic ? 'bg-red-500' : 'bg-indigo-500'}">${pinnacle.number}</div>
+                <div class="absolute left-[30px] top-11 h-full w-0.5 bg-slate-200 ${index === data.pinnacles.length - 1 ? 'hidden' : ''}"></div>
+                <div class="cursor-pointer" onclick="togglePinnacle(this.parentElement)">
+                    <p class="text-sm text-slate-500">${pinnacle.age} tuổi</p>
+                    <h4 class="text-xl font-bold text-slate-800">${pinnacle.title} ${pinnacle.karmic ? '<span class="text-xs font-semibold bg-red-100 text-red-700 px-2 py-1 rounded-full ml-2">Nợ Nghiệp</span>' : ''}</h4>
+                </div>
+                <div class="pinnacle-content max-h-0 opacity-0 overflow-hidden transition-all duration-500">
+                    <p class="text-slate-600">${pinnacle.description}</p>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function renderGuidance(tab) {
+        const contentContainer = document.getElementById('guidance-content');
+        const tabData = data.guidance[tab];
+        contentContainer.innerHTML = `
+            <h3 class="text-2xl font-bold text-slate-800 mb-4">${tabData.title}</h3>
+            <div class="prose max-w-none prose-slate">${tabData.content}</div>
+        `;
+    }
+
+    // --- EVENT LISTENERS & LOGIC ---
+
+    const navLinks = document.querySelectorAll('#nav-menu a');
+    const sections = document.querySelectorAll('.content-section');
+
+    function setActiveSection(hash) {
+        sections.forEach(section => {
+            if ('#' + section.id === hash) {
+                section.classList.add('active');
+            } else {
+                section.classList.remove('active');
+            }
+        });
+        navLinks.forEach(link => {
+            if (link.getAttribute('href') === hash) {
+                link.classList.add('active');
+            } else {
+                link.classList.remove('active');
+            }
+        });
+    }
+
+    navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetHash = this.getAttribute('href');
+            setActiveSection(targetHash);
+            // In a real SPA you'd use history.pushState, but for this single file it's fine.
+            // window.location.hash = targetHash;
+        });
+    });
+
+    const guidanceTabs = document.querySelectorAll('.guidance-tab');
+    guidanceTabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            guidanceTabs.forEach(t => t.classList.remove('active', 'text-indigo-600', 'border-indigo-500'));
+            this.classList.add('active', 'text-indigo-600', 'border-indigo-500');
+            renderGuidance(this.dataset.tab);
+        });
+    });
+
+
+    // Initial state
+    setActiveSection('#tong-quan');
+    renderCoreNumbers();
+    renderBirthChart();
+    renderPinnacles();
+    renderGuidance('potentials');
+    document.querySelector('.guidance-tab[data-tab="potentials"]').classList.add('text-indigo-600', 'border-indigo-500');
+
+    // Add styles for the .cell class used in the birth chart grid
+    const styleSheet = document.createElement("style");
+    styleSheet.type = "text/css";
+    styleSheet.innerText = `
+        .cell {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.75rem; /* rounded-xl */
+            font-size: 1.5rem; /* text-2xl */
+        }
+    `;
+    document.head.appendChild(styleSheet);
+});
+
+// --- TOGGLE FUNCTIONS (Global Scope) ---
+function toggleCard(button) {
+    const card = button.parentElement;
+    const content = card.querySelector('.card-content');
+    const icon = button.querySelector('div:last-child');
+    if (content.style.maxHeight && content.style.maxHeight !== '0px') {
+        content.style.maxHeight = '0px';
+        content.style.opacity = '0';
+        icon.style.transform = 'rotate(0deg)';
+    } else {
+        content.style.maxHeight = content.scrollHeight + 'px';
+        content.style.opacity = '1';
+        icon.style.transform = 'rotate(90deg)';
+    }
+}
+
+function showArrowDetails(card) {
+    const details = card.querySelector('.arrow-details');
+    card.classList.toggle('bg-slate-200');
+    details.classList.toggle('hidden');
+}
+
+function togglePinnacle(item) {
+    // Close other active pinnacles
+    const allPinnacles = document.querySelectorAll('.pinnacle-item');
+    allPinnacles.forEach(p => {
+        if (p !== item && p.classList.contains('active')) {
+            p.classList.remove('active');
+        }
+    });
+    // Toggle current pinnacle
+    item.classList.toggle('active');
+}
+
+</script>
+</body>
+</html>

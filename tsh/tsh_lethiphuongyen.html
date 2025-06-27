@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Khám Phá Thần Số Học: Lê Thị Phương Yên</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Chosen Palette: Earthly Wisdom -->
+    <!-- Application Structure Plan: Tôi đã thiết kế ứng dụng theo cấu trúc dashboard với thanh điều hướng cố định bên trái, cho phép người dùng tự do khám phá các chủ đề phức tạp mà không cần cuộn trang dài. Cấu trúc này phá vỡ tính tuyến tính của báo cáo gốc, biến việc đọc thành một hành trình khám phá. Các phần chính bao gồm: 1. Tổng quan các chỉ số cốt lõi. 2. Giao thoa năng lượng (làm rõ các mâu thuẫn và sức mạnh tổng hợp). 3. Biểu đồ Ngày sinh tương tác, với tính năng đặc biệt cho thấy sự bù đắp của tên gọi. 4. Hành trình 4 Chặng được thể hiện qua dòng thời gian. 5. Định hướng phát triển. Cấu trúc này tối ưu hóa việc tiếp nhận thông tin, giúp người dùng dễ dàng tiêu hóa và tham chiếu từng phần. -->
+    <!-- Visualization & Content Choices: 1. Chỉ số cốt lõi: Mục tiêu: Inform/Compare -> Trình bày: Các thẻ thông tin có thể lật (flip cards) -> Tương tác: Hover để xem chi tiết -> Lý do: Trình bày thông tin cốt lõi ngắn gọn, tạo sự tò mò, cho phép khám phá sâu hơn. 2. Giao thoa Nội tâm (Linh hồn 8 vs Nhân cách 9): Mục tiêu: Explain Relationship -> Trình bày: Sơ đồ cân bằng HTML/CSS -> Tương tác: Hover -> Lý do: Trực quan hóa sự giằng co nội tâm một cách sinh động. 3. Biểu đồ Ngày sinh & Sự bù đắp: Mục tiêu: Organize/Show Relationship -> Trình bày: Lưới HTML/CSS cho biểu đồ ngày sinh và một nút bấm "Xem Bù đắp từ Tên" để thêm các số ảo vào ô trống -> Tương tác: Click/Hover -> Lý do: Biến khái niệm trừu tượng (tên gọi lấp đầy biểu đồ ngày sinh) thành một hình ảnh tương tác, dễ hiểu và đáng nhớ. Đây là "wow factor" chính. 4. Nợ nghiệp: Mục tiêu: Warn/Explain -> Trình bày: Thẻ thông tin nổi bật với icon cảnh báo trong dòng thời gian. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <style>
+        body {
+            font-family: 'Be Vietnam Pro', sans-serif;
+            background-color: #fdfbf8; /* A warm, very light beige */
+        }
+        .nav-item.active {
+            background-color: #7c2d12; /* stone-800 */
+            color: white;
+            font-weight: 600;
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.6s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .pinnacle-item.active .pinnacle-content {
+            max-height: 500px;
+            opacity: 1;
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+        }
+        .guidance-tab.active {
+            border-color: #7c2d12;
+            color: #7c2d12;
+            background-color: #fef3c7; 
+        }
+        .chart-container {
+            position: relative;
+            margin: auto;
+            height: 350px;
+            width: 100%;
+            max-width: 500px;
+        }
+        .birth-grid .cell {
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        .birth-grid .cell.empty:hover .tooltip {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        .tooltip {
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            transform: translateY(10px);
+        }
+        .virtual-number {
+             animation: popIn 0.5s ease-out forwards;
+        }
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            80% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body class="text-stone-800">
+
+    <div class="min-h-screen lg:flex">
+        <!-- Sidebar Navigation -->
+        <aside class="bg-stone-800 text-white lg:w-64 w-full p-4 lg:p-6 shadow-2xl lg:min-h-screen lg:sticky lg:top-0 z-20">
+            <div class="text-center mb-8">
+                <h1 class="text-2xl font-bold text-amber-300">Thần Số Học</h1>
+                <p class="text-sm text-stone-400">Lê Thị Phương Yên</p>
+            </div>
+            <nav id="nav-menu" class="flex lg:flex-col flex-wrap justify-center gap-2">
+                <a href="#tong-quan" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-stone-700 font-medium transition-all duration-200">
+                    <span class="text-xl">🔮</span> Tổng quan
+                </a>
+                <a href="#giao-thoa" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-stone-700 font-medium transition-all duration-200">
+                    <span class="text-xl">✨</span> Giao thoa Nội tâm
+                </a>
+                <a href="#bieu-do" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-stone-700 font-medium transition-all duration-200">
+                    <span class="text-xl">🔢</span> Biểu đồ Ngày sinh
+                </a>
+                <a href="#hanh-trinh" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-stone-700 font-medium transition-all duration-200">
+                    <span class="text-xl">🗺️</span> Hành trình 4 Chặng
+                </a>
+                <a href="#dinh-huong" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-stone-700 font-medium transition-all duration-200">
+                    <span class="text-xl">🌱</span> Định hướng Phát triển
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-4 sm:p-6 lg:p-10">
+            <!-- Section 1: Tổng quan -->
+            <section id="tong-quan" class="content-section">
+                <div class="text-center p-8 bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl shadow-2xl text-white mb-10">
+                    <h2 class="text-4xl font-bold mb-2">Lê Thị Phương Yên</h2>
+                    <p class="text-lg opacity-90">Ngày sinh: 01/05/1996</p>
+                    <div class="mt-6">
+                        <p class="text-lg">Con số Đường đời</p>
+                        <p class="text-8xl font-bold tracking-tighter">4</p>
+                        <p class="mt-2 text-amber-100 max-w-2xl mx-auto">Hành trình của Nhà Kiến Tạo: xây dựng giá trị bền vững qua sự chăm chỉ, kỷ luật và có phương pháp.</p>
+                    </div>
+                </div>
+                
+                <h3 class="text-2xl font-bold text-stone-800 mb-6 text-center">Các Chỉ số Cốt lõi</h3>
+                <p class="max-w-3xl mx-auto text-center text-stone-600 mb-10">Đây là những năng lượng nền tảng định hình nên con người chị. Hãy nhấp vào từng thẻ để khám phá sâu hơn về điểm mạnh và thách thức của mỗi chỉ số.</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="core-numbers-container">
+                    <!-- Cards will be injected by JS -->
+                </div>
+            </section>
+            
+            <!-- Section 2: Giao thoa Năng lượng -->
+            <section id="giao-thoa" class="content-section space-y-12">
+                <h2 class="text-3xl font-bold text-stone-800 text-center mb-10">Bản Giao Hưởng Nội Tâm</h2>
+                 <p class="max-w-3xl mx-auto text-center text-stone-600 -mt-8 mb-12">Sức mạnh thực sự nằm ở việc luận giải sự tương tác giữa các con số. Đây là những động lực và mâu thuẫn cốt lõi, tạo nên hành trình phát triển độc đáo của chị.</p>
+
+                <div class="bg-white p-8 rounded-2xl shadow-lg">
+                    <h3 class="text-2xl font-bold text-stone-800 text-center mb-2">Nhà Lãnh Đạo Nhân Văn</h3>
+                    <p class="text-center text-stone-500 mb-6">Mâu thuẫn và sự dung hòa giữa Linh hồn 8 & Nhân cách 9</p>
+                    <div class="flex items-center justify-center gap-6 my-6">
+                        <div class="text-center p-4 bg-red-50 rounded-lg">
+                            <p class="text-5xl font-bold text-red-600">8</p>
+                            <p class="font-semibold">Linh Hồn: Khát vọng QUYỀN LỰC</p>
+                            <p class="text-sm">Thành công, tự chủ, kiểm soát, tạo dựng đế chế.</p>
+                        </div>
+                        <div class="w-24 h-2 bg-stone-200 rounded-full relative">
+                            <div class="w-6 h-6 bg-stone-600 rounded-full absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2"></div>
+                        </div>
+                        <div class="text-center p-4 bg-sky-50 rounded-lg">
+                            <p class="text-5xl font-bold text-sky-600">9</p>
+                            <p class="font-semibold">Nhân Cách: Vẻ ngoài VỊ THA</p>
+                            <p class="text-sm">Trách nhiệm, lý tưởng, quan tâm đến cộng đồng.</p>
+                        </div>
+                    </div>
+                     <p class="mt-6 text-center text-stone-700 max-w-2xl mx-auto">Đây là xung đột trung tâm: bên trong chị khao khát quyền lực và thành công cá nhân (8), nhưng bên ngoài lại toát ra vẻ của một người có trách nhiệm với cộng đồng (9). Bài học là hợp nhất chúng: **sử dụng quyền lực (8) để phục vụ cho lý tưởng nhân văn (9)**. Thành công của chị không chỉ để cho riêng mình, mà để tạo ra tác động lớn lao và tích cực cho xã hội.</p>
+                </div>
+
+                 <div class="bg-white p-8 rounded-2xl shadow-lg">
+                    <h3 class="text-2xl font-bold text-stone-800 text-center mb-2">Nhà Kiến Tạo Điều Hành</h3>
+                    <p class="text-center text-stone-500 mb-6">Sức mạnh tổng hợp giữa Đường đời 4 & Sứ mệnh 8</p>
+                    <div class="flex flex-col md:flex-row items-center justify-center gap-4 text-center">
+                        <div class="p-6 bg-orange-50 rounded-xl border border-orange-200">
+                            <p class="text-5xl font-bold text-orange-600">4</p>
+                            <p class="font-semibold mt-1">Đường đời: Nhà KIẾN TẠO</p>
+                            <p class="text-sm text-stone-600">Xây dựng nền tảng vững chắc, làm việc chăm chỉ, có hệ thống.</p>
+                        </div>
+                        <div class="text-4xl font-bold text-stone-300">+</div>
+                        <div class="p-6 bg-indigo-50 rounded-xl border border-indigo-200">
+                            <p class="text-5xl font-bold text-indigo-600">8</p>
+                            <p class="font-semibold mt-1">Sứ mệnh: Nhà ĐIỀU HÀNH</p>
+                            <p class="text-sm text-stone-600">Lãnh đạo, quản lý tài chính, có tầm nhìn kinh doanh.</p>
+                        </div>
+                    </div>
+                    <p class="mt-6 text-center text-stone-700 max-w-2xl mx-auto">Đây là sự kết hợp cực kỳ mạnh mẽ và thực tế. Nhiệm vụ của chị không chỉ là một người thợ chăm chỉ (4), mà là một tổng công trình sư, người có tầm nhìn bao quát toàn bộ dự án: từ huy động vốn, quản lý nguồn lực (8) đến việc giám sát thực thi một cách tỉ mỉ (4) để tạo ra những thành tựu quy mô lớn.</p>
+                </div>
+            </section>
+            
+            <!-- Section 3: Biểu đồ Ngày sinh -->
+            <section id="bieu-do" class="content-section">
+                <h2 class="text-3xl font-bold text-stone-800 text-center mb-10">Bản Đồ Năng Lượng Bẩm Sinh (01/05/1996)</h2>
+                 <div class="grid grid-cols-1 lg:grid-cols-5 gap-10 items-start">
+                    <div class="lg:col-span-3 flex flex-col items-center">
+                        <h3 class="font-bold text-xl mb-4 text-center text-stone-800">Lưới Năng lượng & Bài học từ sự khuyết thiếu</h3>
+                        <p class="text-center text-stone-600 mb-6 max-w-md">Lưới này cho thấy năng lượng bẩm sinh. Các ô trống là những bài học lớn nhất. Di chuột vào một ô trống để khám phá.</p>
+                        <div id="birth-chart-grid" class="birth-grid relative grid grid-cols-3 gap-2 w-64 h-64 md:w-80 md:h-80 shadow-2xl bg-white p-4 rounded-2xl">
+                            <!-- Cells are injected by JS -->
+                        </div>
+                        <p class="text-center text-stone-600 mt-4 max-w-md">Mũi tên sức mạnh duy nhất: <span class="font-bold text-green-600">Mũi tên Quyết tâm 1-5-9</span>, cho chị một ý chí và nghị lực phi thường.</p>
+                    </div>
+                    <div class="lg:col-span-2">
+                        <h3 class="font-bold text-xl mb-4 text-center text-stone-800">Sự Bù Đắp Kỳ Diệu Từ Tên Gọi</h3>
+                         <p class="text-center text-stone-600 mb-6 mx-auto">Cái tên "Lê Thị Phương Yên" hoạt động như một sứ mệnh giải cứu, mang đến những năng lượng còn thiếu trong ngày sinh.</p>
+                        <div class="bg-white p-4 sm:p-6 rounded-xl shadow-lg space-y-4">
+                             <div class="flex flex-col items-center">
+                                 <p class="font-semibold text-stone-700 mb-4">Các "viên đá quý" từ tên gọi:</p>
+                                 <div class="flex flex-wrap gap-3 justify-center">
+                                     <span class="px-3 py-1 bg-sky-100 text-sky-800 rounded-full font-medium text-sm">Nhân cách 9</span>
+                                     <span class="px-3 py-1 bg-red-100 text-red-800 rounded-full font-medium text-sm">Sứ mệnh 8</span>
+                                     <span class="px-3 py-1 bg-red-100 text-red-800 rounded-full font-medium text-sm">Linh hồn 8</span>
+                                     <span class="px-3 py-1 bg-amber-100 text-amber-800 rounded-full font-medium text-sm">Thái độ 6</span>
+                                 </div>
+                                 <button id="fill-chart-btn" class="mt-6 bg-stone-700 text-white font-semibold px-4 py-2 rounded-lg hover:bg-stone-800 transition-all">Xem Sự Bù Đắp</button>
+                             </div>
+                             <p id="fill-explanation" class="pt-4 text-center text-sm text-stone-600 transition-opacity duration-500 opacity-0">Tên gọi đã bổ sung các số 2, 3, 7, 8. Con số duy nhất vẫn còn trống hoàn toàn là <span class="font-bold text-orange-600 text-base">số 4</span>, khẳng định đây chính là bài học cốt lõi chị phải tự mình chinh phục trong cuộc đời.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4: Hành trình 4 Chặng -->
+            <section id="hanh-trinh" class="content-section">
+                <h2 class="text-3xl font-bold text-stone-800 text-center mb-2">Bốn Mùa Cuộc Đời</h2>
+                <p class="max-w-3xl mx-auto text-center text-stone-600 mb-12">Cuộc đời được chia thành 4 giai đoạn lớn, gọi là 4 Đỉnh cao. Mỗi giai đoạn mang một bài học và cơ hội riêng. Chị đang ở trong Đỉnh cao số 1. Hãy nhấp vào từng chặng để khám phá.</p>
+                <div id="pinnacles-timeline" class="space-y-4"></div>
+            </section>
+            
+            <!-- Section 5: Định hướng Phát triển -->
+            <section id="dinh-huong" class="content-section">
+                <h2 class="text-3xl font-bold text-stone-800 text-center mb-10">Kim Chỉ Nam Hành Động</h2>
+                <div class="max-w-4xl mx-auto">
+                    <div id="guidance-tabs" class="flex justify-center border-b border-stone-200 mb-6 flex-wrap gap-2 sm:gap-4">
+                         <!-- Tabs will be injected by JS -->
+                    </div>
+                    <div id="guidance-content" class="bg-white p-6 sm:p-8 rounded-xl shadow-lg min-h-[300px]">
+                        <!-- Content will be injected by JS -->
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const data = {
+        coreNumbers: [
+            { number: '4', title: 'Đường đời', color: 'orange', description: 'Hành trình của Nhà Kiến Tạo: học cách xây dựng giá trị bền vững qua sự chăm chỉ, kỷ luật và có phương pháp.' },
+            { number: '8', title: 'Sứ mệnh', color: 'indigo', description: 'Nhiệm vụ của Nhà Điều Hành: học cách sử dụng quyền lực, quản lý tài chính và lãnh đạo để đạt thành tựu lớn.' },
+            { number: '8', title: 'Linh hồn', color: 'red', description: 'Khát vọng sâu thẳm về sự thành công, độc lập, kiểm soát và được công nhận về năng lực.' },
+            { number: '9', title: 'Nhân cách', color: 'sky', description: 'Vẻ ngoài của người có lý tưởng, đáng tin cậy, trách nhiệm và luôn quan tâm đến cộng đồng.' },
+            { number: '6', title: 'Thái độ', color: 'amber', description: 'Phản ứng bản năng bằng sự chăm sóc, bảo vệ và nỗ lực tái lập sự hòa hợp, cân bằng.' }
+        ],
+        birthChart: {
+            grid: [
+                { num: '1', count: 2, pos: [2, 0] },
+                { num: '5', count: 1, pos: [1, 1] },
+                { num: '6', count: 1, pos: [0, 1] },
+                { num: '9', count: 2, pos: [0, 2] }
+            ],
+            emptyCells: [
+                { num: 2, pos: [1, 0], text: 'Bài học về Trực giác & Thấu cảm' },
+                { num: 3, pos: [0, 0], text: 'Bài học về Tư duy & Giao tiếp' },
+                { num: 4, pos: [2, 1], text: 'Bài học Cốt lõi: Kỷ luật & Tổ chức' },
+                { num: 7, pos: [2, 2], text: 'Bài học về Trải nghiệm & Phân tích' },
+                { num: 8, pos: [1, 2], text: 'Bài học về Độc lập & Trí tuệ cảm xúc' }
+            ],
+            virtualNumbers: [
+                { num: 2, pos: [1, 0] }, { num: 3, pos: [0, 0] }, { num: 7, pos: [2, 2] }, { num: 8, pos: [1, 2] }
+            ]
+        },
+        pinnacles: [
+            { number: '6', age: '0 - 32', title: 'Trách nhiệm, Gia đình & Sáng tạo', current: true, description: 'Giai đoạn hiện tại của chị (đến 2028). Đây là thời kỳ để học các bài học về trách nhiệm, tình yêu thương, và sự sáng tạo. Giai đoạn này là để xây dựng nền tảng cảm xúc và trách nhiệm, trước khi bước vào giai đoạn xây dựng sự nghiệp mạnh mẽ hơn.' },
+            { number: '8', age: '32 - 41', title: 'Xây dựng Quyền lực & Sự nghiệp', description: 'Giai đoạn này cộng hưởng mạnh mẽ với Sứ mệnh & Linh hồn 8. Đây là thời điểm vàng để mạnh dạn bước ra ngoài, nắm bắt cơ hội, xây dựng sự độc lập và tạo ra những thành tựu vật chất to lớn. Bài học của Đường đời 4 sẽ được thực hành mạnh mẽ nhất tại đây.' },
+            { number: '14/5', age: '41 - 50', title: 'Thử thách Nợ nghiệp & Tự do', karmic: true, description: 'Một giai đoạn thử thách lớn, đối mặt Nợ nghiệp 14/5. Sẽ có nhiều biến động, thay đổi bất ngờ. Bài học là phải học cách tự chủ, sử dụng tự do một cách có trách nhiệm. Đây là bài kiểm tra độ vững chắc của nền móng (Đường đời 4) đã xây dựng ở các giai đoạn trước.' },
+            { number: '3', age: '50+', title: 'Sáng tạo & Niềm vui Biểu đạt', description: 'Sau khi vượt qua thử thách, đây là giai đoạn tận hưởng thành quả, thể hiện bản thân một cách tự do, vui vẻ. Niềm vui sẽ đến từ giao tiếp, viết lách, nghệ thuật và chia sẻ trí tuệ đã đúc kết.' }
+        ],
+        guidance: {
+            career: { title: 'Sự nghiệp', content: `<p class="mb-4">Sự nghiệp lý tưởng phải dung hòa được 3 năng lượng: xây dựng bền vững (4), quản lý quyền lực (8) và phục vụ cộng đồng (9). Các lĩnh vực phù hợp:</p><ul class="list-disc list-inside space-y-2"><li><strong>Lãnh đạo Doanh nghiệp xã hội/Tổ chức phi lợi nhuận:</strong> Các vị trí CEO, giám đốc điều hành, nơi dùng tài năng kinh doanh (8) để tạo ra lợi ích cộng đồng (9) trên nền tảng vững chắc (4).</li><li><strong>Chuyên gia Tài chính/Đầu tư có đạo đức:</strong> Quản lý quỹ, hoạch định tài chính, với tôn chỉ đầu tư có trách nhiệm và tạo giá trị lâu dài.</li><li><strong>Luật sư hoặc Chính trị gia:</strong> Con đường trực tiếp để sử dụng quyền lực (8) nhằm bảo vệ công lý và xây dựng chính sách phục vụ cộng đồng (9).</li><li><strong>Nhà Từ thiện Chuyên nghiệp:</strong> Sáng lập và điều hành các quỹ từ thiện quy mô lớn, dùng kỹ năng quản lý của số 8 để tối đa hóa tác động nhân đạo của số 9.</li></ul>`},
+            personal: { title: 'Phát triển Cá nhân', content: `<p class="mb-4">Chìa khóa phát triển nằm ở việc chủ động "lấp đầy" các ô trống trong biểu đồ ngày sinh, vốn cũng là bài học của Đường đời 4:</p><ul class="list-disc list-inside space-y-2"><li><strong>Rèn luyện tính Kỷ luật (lấp số 4):</strong> Đây là ưu tiên số một. Hãy bắt đầu bằng việc lập kế hoạch chi tiết cho ngày, tuần, tháng. Sử dụng các công cụ quản lý công việc và nỗ lực tuân thủ chúng. Hãy biến sự kỷ luật trở thành một thói quen.</li><li><strong>Cân bằng Cảm xúc (lấp số 2, 8):</strong> Thực hành thiền định hoặc yoga để kết nối và làm dịu nội tâm. Viết nhật ký để biểu đạt những cảm xúc khó nói. Học về Trí tuệ cảm xúc (EQ) để hiểu mình, hiểu người.</li><li><strong>Học hỏi qua Trải nghiệm (lấp số 7):</strong> Đừng chỉ phân tích, hãy hành động. Tham gia các khóa học, đọc sách, đi du lịch để tích lũy kinh nghiệm. Chấp nhận thất bại như một phần của quá trình học hỏi.</li><li><strong>Cân bằng Quyền lực & Lòng nhân ái (8 và 9):</strong> Luôn tự hỏi: "Mục tiêu này có phục vụ điều gì lớn hơn bản thân mình không?". Gắn tham vọng cá nhân (8) với mục đích cao cả (9) sẽ tạo ra động lực mạnh mẽ và bền vững.</li></ul>`}
+        }
+    };
+    
+    function renderCoreNumbers() {
+        const container = document.getElementById('core-numbers-container');
+        const colors = { orange: 'text-orange-600 bg-orange-100', indigo: 'text-indigo-600 bg-indigo-100', red: 'text-red-600 bg-red-100', sky: 'text-sky-600 bg-sky-100', amber: 'text-amber-600 bg-amber-100' };
+        container.innerHTML = data.coreNumbers.map(item => `
+            <div class="bg-white rounded-xl shadow-lg p-6 text-center transition-transform transform hover:-translate-y-2">
+                <p class="font-semibold text-stone-500">${item.title}</p>
+                <p class="text-6xl font-bold my-2 ${colors[item.color].split(' ')[0]}">${item.number}</p>
+                <p class="text-sm text-stone-600 min-h-[60px] flex items-center justify-center">${item.description}</p>
+            </div>
+        `).join('');
+    }
+
+    function renderBirthChart() {
+        const grid = document.getElementById('birth-chart-grid');
+        grid.innerHTML = '';
+        
+        const arrowContainer = document.createElement('div');
+        arrowContainer.id = 'arrow-container';
+        arrowContainer.className = 'absolute top-0 left-0 w-full h-full pointer-events-none';
+        grid.appendChild(arrowContainer);
+
+        const cells = Array(3).fill(null).map(() => Array(3).fill(null));
+        
+        data.birthChart.grid.forEach(item => {
+            cells[item.pos[0]][item.pos[1]] = { num: item.num, count: item.count, virtual: false };
+        });
+
+        data.birthChart.emptyCells.forEach(item => {
+            cells[item.pos[0]][item.pos[1]] = { num: item.num, text: item.text, empty: true, virtual: false };
+        });
+
+        for(let r=0; r<3; r++) {
+            for(let c=0; c<3; c++) {
+                const cellData = cells[r][c];
+                const cellEl = document.createElement('div');
+                cellEl.className = 'cell flex items-center justify-center border border-stone-200 rounded-lg text-2xl font-bold';
+                if (cellData.empty) {
+                    cellEl.classList.add('empty', 'text-stone-300', 'relative');
+                    cellEl.innerHTML = `<span>${cellData.num}</span><div class="tooltip absolute -bottom-14 w-40 p-2 bg-stone-800 text-white text-xs rounded-lg shadow-lg z-10 text-center">${cellData.text}</div>`;
+                } else {
+                    cellEl.classList.add('bg-amber-100', 'text-amber-800');
+                    cellEl.textContent = cellData.num.repeat(cellData.count);
+                }
+                grid.appendChild(cellEl);
+            }
+        }
+        
+        const line = document.createElement('div');
+        line.style.cssText = `position: absolute; top: 50%; left: 0; width: 100%; height: 4px; background-color: rgba(22, 163, 74, 0.4); transform-origin: left; transform: rotate(45deg) scaleX(1.414) translateX(20.5%) translateY(-70%);`;
+        arrowContainer.appendChild(line);
+
+        document.getElementById('fill-chart-btn').addEventListener('click', function() {
+            const emptyGridCells = grid.querySelectorAll('.cell.empty');
+            data.birthChart.virtualNumbers.forEach(vNum => {
+                emptyGridCells.forEach(cell => {
+                    if (cell.querySelector('span').textContent == vNum.num) {
+                        cell.classList.remove('empty', 'text-stone-300');
+                        cell.classList.add('bg-teal-100', 'text-teal-800', 'virtual-number');
+                        cell.querySelector('.tooltip').remove();
+                    }
+                });
+            });
+            this.disabled = true;
+            this.textContent = 'Đã Bù Đắp';
+            this.classList.add('bg-stone-400', 'cursor-not-allowed');
+            document.getElementById('fill-explanation').style.opacity = '1';
+        });
+    }
+
+    function renderPinnacles() {
+        const container = document.getElementById('pinnacles-timeline');
+        container.innerHTML = data.pinnacles.map((p, index) => `
+            <div class="pinnacle-item relative pl-12 transition-all duration-500 ${p.current ? 'active' : ''}">
+                <div class="absolute left-4 top-2 w-8 h-8 rounded-full flex items-center justify-center font-bold text-white ${p.karmic ? 'bg-red-600' : (p.current ? 'bg-amber-500 animate-pulse' : 'bg-stone-700')}">${p.number.split('/')[0]}</div>
+                <div class="absolute left-[30px] top-11 h-full w-0.5 bg-stone-200 ${index === data.pinnacles.length - 1 ? 'hidden' : ''}"></div>
+                <div class="cursor-pointer" onclick="togglePinnacle(this.parentElement)">
+                    <p class="text-sm text-stone-500">${p.age} tuổi ${p.current ? '<span class="text-xs font-semibold bg-amber-100 text-amber-700 px-2 py-1 rounded-full ml-2">HIỆN TẠI</span>' : ''}</p>
+                    <h4 class="text-xl font-bold text-stone-800">${p.title} ${p.karmic ? '<span class="text-sm font-semibold text-red-600">(Nợ Nghiệp)</span>' : ''}</h4>
+                </div>
+                <div class="pinnacle-content max-h-0 opacity-0 overflow-hidden transition-all duration-500">
+                    <p class="text-stone-600">${p.description}</p>
+                </div>
+            </div>
+        `).join('');
+        const currentPinnacle = document.querySelector('.pinnacle-item.active');
+        if (currentPinnacle) {
+            const content = currentPinnacle.querySelector('.pinnacle-content');
+            content.style.maxHeight = content.scrollHeight + 'px';
+            content.style.opacity = '1';
+        }
+    }
+
+    function renderGuidance() {
+        const tabsContainer = document.getElementById('guidance-tabs');
+        tabsContainer.innerHTML = Object.keys(data.guidance).map(key => 
+            `<button data-tab="${key}" class="guidance-tab px-4 py-2 font-semibold text-stone-600 border-b-2 border-transparent hover:text-stone-800 transition-colors duration-200 rounded-t-lg">${data.guidance[key].title}</button>`
+        ).join('');
+        
+        const contentContainer = document.getElementById('guidance-content');
+        function updateGuidanceContent(tabKey) {
+            const tabData = data.guidance[tabKey];
+            contentContainer.innerHTML = `<div class="prose max-w-none prose-stone">${tabData.content}</div>`;
+        }
+        tabsContainer.addEventListener('click', e => {
+            if (e.target.matches('.guidance-tab')) {
+                tabsContainer.querySelectorAll('.guidance-tab').forEach(t => t.classList.remove('active'));
+                e.target.classList.add('active');
+                updateGuidanceContent(e.target.dataset.tab);
+            }
+        });
+        tabsContainer.querySelector('.guidance-tab').classList.add('active');
+        updateGuidanceContent('personal');
+    }
+    
+    // NAVIGATION LOGIC
+    const navLinks = document.querySelectorAll('#nav-menu a');
+    const sections = document.querySelectorAll('.content-section');
+    function setActiveSection(hash) {
+        sections.forEach(section => section.id === hash.substring(1) ? section.classList.add('active') : section.classList.remove('active'));
+        navLinks.forEach(link => link.getAttribute('href') === hash ? link.classList.add('active') : link.classList.remove('active'));
+    }
+    navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetHash = link.getAttribute('href');
+            setActiveSection(targetHash);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    });
+
+    // INITIALIZATION
+    setActiveSection('#tong-quan');
+    renderCoreNumbers();
+    renderBirthChart();
+    renderPinnacles();
+    renderGuidance();
+});
+
+// Global scope functions for inline onclick
+function togglePinnacle(item) {
+    item.classList.toggle('active');
+    const content = item.querySelector('.pinnacle-content');
+    if (content.style.maxHeight && content.style.maxHeight !== '0px') {
+        content.style.maxHeight = '0px';
+        content.style.opacity = '0';
+    } else {
+        content.style.maxHeight = content.scrollHeight + 'px';
+        content.style.opacity = '1';
+    }
+}
+</script>
+</body>
+</html>
