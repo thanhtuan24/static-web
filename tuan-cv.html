@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tran Thanh Tuan — Senior Full-Stack Engineer (9 years)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    /* --- General Styling & Theme --- */
+    :root {
+      --bg: #0b0e14;
+      --card: #121722;
+      --ink: #e6edf3;
+      --muted: #9fb0c3;
+      --acc: #6aa6ff;
+      --chip: #1a2332;
+      --line: #233044;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      background: linear-gradient(180deg, #0b0e14, #0b1018);
+      color: var(--ink);
+      font: 400 14px/1.65 Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    a {
+      color: var(--acc);
+      text-decoration: none;
+    }
+    p {
+        margin: 0;
+    }
+    ul {
+        padding-left: 18px;
+        margin: 10px 0 0 0;
+    }
+    li {
+        margin-bottom: 8px;
+    }
+
+    /* --- Layout --- */
+    .container {
+      max-width: 1024px;
+      margin: auto;
+      padding: 24px;
+    }
+    .toolbar {
+      position: sticky;
+      top: 16px;
+      z-index: 20;
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      margin-bottom: 16px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 12px 40px rgba(2, 6, 23, .45);
+      margin-bottom: 24px;
+      /* Ensures pages break correctly when printing */
+      break-after: page;
+    }
+     .card:last-of-type {
+        break-after: auto;
+     }
+
+    /* --- Buttons --- */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--acc);
+      color: #051327;
+      padding: 10px 16px;
+      border: 0;
+      border-radius: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 14px;
+      transition: background-color 0.2s ease;
+    }
+    .btn:hover {
+        background: #8bc0ff;
+    }
+    .btn.secondary {
+      background: #1e293b;
+      color: var(--ink);
+    }
+     .btn.secondary:hover {
+        background: #2c3a50;
+    }
+
+    /* --- Header --- */
+    .header {
+      display: grid;
+      grid-template-columns: 0.9fr 1.1fr;
+      gap: 24px;
+      padding: 28px;
+      align-items: center;
+      border-bottom: 1px solid var(--line);
+    }
+    .name {
+      font-size: 34px;
+      margin: 0 0 6px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+    .title {
+      margin: 0;
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 16px;
+    }
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .pill {
+      background: var(--chip);
+      border: 1px solid var(--line);
+      padding: 6px 12px;
+      border-radius: 999px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    /* --- Main Content Sections --- */
+    .sections {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 12px;
+      padding: 12px 28px 28px;
+    }
+    .section h2 {
+      margin: 0 0 16px;
+      font-size: 16px;
+      text-transform: uppercase;
+      color: #bcd2ee;
+      letter-spacing: 0.5px;
+    }
+
+    /* --- Experience Section --- */
+    .exp {
+      display: grid;
+      gap: 20px;
+    }
+    .exp-item {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 4px 16px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #0f1420;
+      break-inside: avoid;
+    }
+    .role {
+      font-weight: 700;
+      font-size: 15px;
+      margin: 0;
+    }
+    .company {
+      color: var(--muted);
+      margin: 2px 0 0;
+    }
+    .dates {
+      color: #a7c2ff;
+      font-weight: 700;
+      grid-row: 1;
+      grid-column: 2;
+    }
+    .exp-item ul {
+        grid-column: 1 / -1;
+    }
+    .exp-item li {
+        color: var(--muted);
+    }
+    
+    /* --- Aside / Sidebar --- */
+    .aside .block {
+      padding: 16px 18px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #0f1420;
+      margin-bottom: 16px;
+      break-inside: avoid;
+    }
+    .aside .block strong {
+        font-size: 15px;
+    }
+    .aside .block p {
+        margin: 8px 0 0;
+        color: var(--muted)
+    }
+    .skills {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .group-title {
+      width: 100%;
+      font-size: 12px;
+      font-weight: 600;
+      color: #c9ddff;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .chip {
+      background: var(--chip);
+      border: 1px solid var(--line);
+      padding: 5px 10px;
+      border-radius: 10px;
+      font-size: 13px;
+    }
+
+    /* --- Footer --- */
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 28px;
+      border-top: 1px dashed var(--line);
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .mono {
+        font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* --- Print-specific Styles --- */
+    @page {
+      size: A4;
+      margin: 5mm;
+    }
+    @media print {
+      body {
+        background: #fff;
+        color: #000;
+        font-size: 10pt;
+      }
+      .toolbar {
+        display: none;
+      }
+      .container {
+        padding: 0;
+        max-width: 100%;
+      }
+      .card {
+        box-shadow: none;
+        border: 0;
+        border-radius: 0;
+        margin-bottom: 0;
+      }
+      :root {
+        --bg: #fff;
+        --card: #fff;
+        --ink: #222;
+        --muted: #555;
+        --acc: #0056b3;
+        --chip: #f0f0f0;
+        --line: #ddd;
+      }
+      .sections {
+        grid-template-columns: 1fr 320px;
+        padding: 12px 0;
+        gap: 12px;
+      }
+      .section h2 {
+        color: #6aa6ff;
+      }
+	  .group-title {
+        color: #a7c2ff;
+	  }
+      .header {
+        padding: 16px 0;
+      }
+      .section {
+        padding: 10px 0;
+      }
+      .name { font-size: 23pt; }
+      .title { font-size: 12pt; }
+      .pill { font-size: 9pt; }
+      .exp-item, .aside .block { background: #fafafa; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="toolbar">
+      <a class="btn secondary" href="https://www.linkedin.com/in/tuanthanh-tran/" target="_blank">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+        LinkedIn
+      </a>
+      <button class="btn" onclick="window.print()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+        In / Lưu dạng PDF
+      </button>
+    </div>
+
+    <!-- Page 1 -->
+    <article class="card">
+      <header class="header">
+        <div>
+          <h3 class="name">TRAN THANH TUAN</h3>
+          <p class="title">Senior Full-Stack / Software Engineer</p>
+          <div class="meta">
+            <span class="pill">Da Nang, Viet Nam</span>
+            <a class="pill" href="tel:+84904440146">+84 904 440 146</a>
+            <a class="pill" href="mailto:thanhtuan2494@gmail.com">thanhtuan2494@gmail.com</a>
+          </div>
+        </div>
+        <aside class="aside">
+          <div class="block">
+            <strong>Summary</strong>
+            <p>An engineer with strong delivery experience across enterprise web applications and microservices. Comfortable driving requirements to production: analysis, estimation, design, implementation, testing, and CI/CD. A quick learner with solid problem-solving skills and hands-on with Java/Node stacks and cloud deployments.</p>
+          </div>
+        </aside>
+      </header>
+
+      <div class="sections">
+        <main>
+          <section class="section">
+            <h2>Experience</h2>
+            <div class="exp">
+              <div class="exp-item">
+                <div>
+                  <p class="role">Senior Analyst II Software Engineering</p>
+                  <p class="company">DXC Technology</p>
+                </div>
+                <div class="dates">Mar 2020 – Present</div>
+                <ul>
+                  <li>Responsible for requirement analysis, estimation, creating design documents, and splitting epics into user stories with acceptance criteria.</li>
+                  <li>Delivered features across Java Spring (Boot/MVC), Node.js/Express, and React for microservices & automation.</li>
+                  <li>Implemented CI/CD pipelines and code quality gates using Jenkins and SonarQube.</li>
+                  <li>Managed Azure deployments for APIs & Web Apps; operated WebLogic/Tomcat/JBoss.</li>
+                  <li>Built Java tool to send events to PagerDuty; import tool for orchestration settings & event rules.</li>
+                  <li>Mentored junior developers and introduced coding standards workshops to uplift overall team quality.</li>
+                </ul>
+              </div>
+              <div class="exp-item">
+                <div>
+                  <p class="role">Software Engineer</p>
+                  <p class="company">FPT Software</p>
+                </div>
+                <div class="dates">Sep 2016 – Jan 2020</div>
+                <ul>
+                  <li>Developed enterprise applications on Salesforce (Apex, Visualforce, Flows) and .NET/SharePoint solutions.</li>
+                  <li>Wrote DevOps scripts with PowerShell; developed front-ends with AngularJS and SQL layers.</li>
+                  <li>Customized approval flows and security models on Salesforce to match client compliance requirements.</li>
+                </ul>
+              </div>
+            </div>
+          </section>
+        </main>
+        <aside class="aside">
+          <section class="section" style="border:0;padding:0">
+            <div class="block">
+              <h2 style="margin-top:0">Tech Stack</h2>
+              <div class="skills">
+                <div class="group"><div class="group-title">Frontend & UI</div><span class="chip">React.js</span><span class="chip">Next.js</span><span class="chip">Tailwind CSS</span><span class="chip">TypeScript</span><span class="chip">JavaScript</span></div>
+                <div class="group"><div class="group-title">Backend & Microservices</div><span class="chip">Node.js</span><span class="chip">NestJS</span><span class="chip">Java (Spring Boot/MVC/Security)</span><span class="chip">C#/.NET</span></div>
+                <div class="group"><div class="group-title">Databases & Storage</div><span class="chip">PostgreSQL</span><span class="chip">MySQL</span><span class="chip">SQL Server</span><span class="chip">Oracle</span><span class="chip">MongoDB</span><span class="chip">Azure Cosmos DB</span></div>
+                <div class="group"><div class="group-title">DevOps & Infra</div><span class="chip">Docker</span><span class="chip">Kubernetes</span><span class="chip">CI/CD — Jenkins, GitHub Actions</span><span class="chip">Quality — SonarQube, Fortify</span></div>
+                <div class="group"><div class="group-title">Cloud & Platforms</div><span class="chip">Azure App Service</span><span class="chip">Azure Functions</span><span class="chip">WebLogic</span><span class="chip">Tomcat</span><span class="chip">JBoss</span></div>
+              </div>
+            </div>
+          </section>
+        </aside>
+      </div>
+    </article>
+
+    <!-- Page 2 -->
+    <article class="card">
+       <div class="sections">
+        <main>
+            <section class="section">
+                <h2>Projects</h2>
+                <ul>
+                    <li><strong>OMC (2024–Present):</strong> Built Java tools to integrate with PagerDuty (event sender & orchestration import).</li>
+                    <li><strong>MOMOCO:</strong> A microservice-based order & catalog service using NestJS, PostgreSQL, and MongoDB.</li>
+                    <li><strong>NEUPC:</strong> Developed RESTful APIs and Angular front-end modules for an energy utility platform.</li>
+                    <li><strong>DAS:</strong> Created reporting and monitoring modules with Azure Functions, Blob Storage, and Log Analytics.</li>
+                    <li><strong>MOH:</strong> A healthcare data integration project utilizing Spring Boot and secure APIs.</li>
+                    <li><strong>ACOM:</strong> A financial services project where I implemented CI/CD pipelines and quality gates.</li>
+                    <li><strong>Health Insurance / RCCS / POMMP (at FPT):</strong> Enterprise applications based on Salesforce and .NET.</li>
+                </ul>
+            </section>
+             <section class="section">
+                <h2>Education & Certifications</h2>
+                <ul>
+                    <li><strong>B.Sc. in Software Engineering</strong> — FPT University</li>
+                    <li><strong>Microsoft Certified: Azure Developer Associate</strong></li>
+                    <li><strong>Microsoft Certified: Azure AI Engineer Associate</strong></li>
+                    <li><strong>Salesforce Certified Platform Developer I</strong></li>
+                    <li><strong>Oracle Certified Associate, Java SE 8 Programmer</strong></li>
+                    <li><strong>Advanced Data Structures & Algorithms in Java</strong> — Skillsoft</li>
+                    <li><strong>Java Programming: Solving Problems with Software</strong> — Coursera</li>
+                </ul>
+            </section>
+        </main>
+        <aside class="aside">
+          <section class="section" style="border:0;padding:0">
+            <div class="block">
+              <h2 style="margin-top:0">Languages</h2>
+              <div class="skills">
+                <span class="chip">Vietnamese — Native</span>
+                <span class="chip">English — Proficient</span>
+                <span class="chip">Japanese — Limited working</span>
+              </div>
+            </div>
+          </section>
+        </aside>
+      </div>
+    </article>
+
+  </div>
+
+  <script>
+    // Set the "last updated" date to today
+    document.getElementById('today').textContent = new Date().toISOString().slice(0, 10);
+  </script>
+</body>
+</html>
