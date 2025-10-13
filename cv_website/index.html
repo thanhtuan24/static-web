@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CV – Yen Le</title>
+    <!-- Link to the main stylesheet -->
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <!--
+      The entire CV is wrapped in a container so that
+      printing to PDF will preserve margins and page breaks.  The
+      `.page` class ensures that each chunk of content stays on its
+      own sheet when printed.  The button below the CV allows
+      downloading/printing the document.  A separate file input is
+      placed over the avatar so the user can click the photo to
+      update it.
+    -->
+    <div id="cv">
+      <!-- Page 1 of the CV -->
+      <div class="page" id="page1">
+        <header class="header">
+          <div class="header-left">
+            <h1 class="name">YEN LE</h1>
+            <h2 class="role">QA Engineer</h2>
+            <div class="contact">
+              <!-- Each contact line has an icon and some text.  Unicode
+                   characters are used here instead of external icon
+                   libraries to keep everything self‑contained.  -->
+              <div class="contact-item">
+                <div class="icon">✉</div>
+                <span>phuongyen026@gmail.com</span>
+              </div>
+              <div class="contact-item">
+                <div class="icon">☎</div>
+                <span>0965420230</span>
+              </div>
+              <div class="contact-item">
+                <div class="icon">📍</div>
+                <span>Da Nang, Viet Nam</span>
+              </div>
+              <div class="contact-item">
+                <div class="icon">🌐</div>
+                <span>Viet Nam</span>
+              </div>
+              <div class="contact-item">
+                <div class="icon">🔗</div>
+                <span>https://www.linkedin.com/in/phuong-yen-qa</span>
+              </div>
+            </div>
+          </div>
+          <div class="header-right">
+            <div class="avatar-wrapper">
+              <!-- Default avatar image extracted from the supplied PDF. -->
+              <img id="avatar" src="avatar.png" alt="Avatar" />
+              <!-- Hidden file input sits on top of the avatar.  When
+                   clicked, it allows the user to choose a new image.  -->
+              <input
+                type="file"
+                id="avatarInput"
+                accept="image/*"
+                title="Change avatar"
+              />
+            </div>
+          </div>
+        </header>
+
+        <!-- Profile section -->
+        <section class="section profile">
+          <h3 class="section-title"><span class="icon-title">👤</span>PROFILE</h3>
+          <p>
+            Experienced QA Engineer with 5+ years of experience.  A meticulous
+            and hard‑working person with experience in manual testing,
+            API testing, SQL knowledge and significant test techniques.
+            Deeply understand the Software Development Life Cycle,
+            particularly the Software QA process. I am familiar with Agile,
+            Scrum, Jira and have worked on many different projects. My
+            ambition is to work in a competitive environment where I can
+            effectively utilize and improve my own skills as an individual
+            as well as a key member in the development of the organization.
+          </p>
+        </section>
+
+        <!-- Professional experience -->
+        <section class="section experience">
+          <h3 class="section-title"><span class="icon-title">💼</span>PROFESSIONAL EXPERIENCE</h3>
+          <!-- New Job: HiveNet at FPT Software (June 2024 – present) -->
+          <div class="job">
+            <div class="date">
+              <div>06/2024 – present</div>
+              <div>Viet Nam</div>
+            </div>
+            <div class="company">
+              <h4>FPT Software – Project HiveNet</h4>
+              <h5>Test Engineer</h5>
+              <ul>
+                <li>Participate in an agile Scrum project and attend daily stand‑up meetings to report progress.</li>
+                <li>Write test cases for new features and prepare test plans for major builds in each sprint.</li>
+                <li>Execute regression tests or sanity tests for every release.</li>
+                <li>Perform cross‑platform testing on multiple iOS and Android devices as well as desktop applications.</li>
+                <li>Use Xray to create test cases and manage bugs through Jira.</li>
+                <li>Collaborate with a global team via Slack.</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Job 1: CTNET (Oct 2022 – May 2024) -->
+          <div class="job">
+            <div class="date">
+              <div>10/2022 – 05/2024</div>
+              <div>Da Nang, Viet Nam</div>
+            </div>
+            <div class="company">
+              <h4>CTNET</h4>
+              <h5>QA Engineer</h5>
+              <ul>
+                <li>Analyze user requirements and specifications to ensure software quality.</li>
+                <li>Develop and execute test cases to identify software defects.</li>
+                <li>Develop and implement quality assurance processes and procedures to ensure software quality.</li>
+                <li>Generate detailed bug reports for software development teams.</li>
+                <li>Use defect tracking tools JIRA to track software defects.</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Job 2: TMA Solutions -->
+          <div class="job">
+            <div class="date">
+              <div>08/2020 – 07/2022</div>
+              <div>Ho Chi Minh, Viet Nam</div>
+            </div>
+            <div class="company">
+              <h4>TMA Solutions</h4>
+              <h5>QA Test Engineer</h5>
+              <ul>
+                <li>Join daily stand‑up meetings to report daily tasks and raise issues.</li>
+                <li>Analyze requirements from user stories and prepare test cases.</li>
+                <li>Log bug tickets, verify fixes and prepare test reports.</li>
+                <li>Demonstrate functions or modules to users.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+<br/>
+        <!-- Projects (only the first two projects appear on page 1) -->
+        <section class="section projects">
+          <h3 class="section-title"><span class="icon-title">📂</span>PROJECTS</h3>
+          <!-- New project highlighting the HiveNet testing effort -->
+          <div class="project">
+            <h4>HiveNet</h4>
+            <ul>
+              <li>Conduct cross‑platform testing on PC, iOS and Android to ensure consistent behaviour across devices.</li>
+              <li>Validate functionality on multiple device models and a range of operating system versions.</li>
+            </ul>
+          </div>
+
+          <div class="project">
+            <h4>Vascopay</h4>
+            <ul>
+              <li>Prepare test cases, test data and test API using Postman.</li>
+              <li>Perform testing of the mobile app on multiple devices (Android and iOS).</li>
+              <li>Deploy the source code package on Linux servers.</li>
+              <li>Demonstrate the user story with expectations from the user.</li>
+              <li>Manipulate and prepare data tests with SQL Server 2016.</li>
+            </ul>
+          </div>
+          <div class="project">
+            <h4>Flexepin</h4>
+            <ul>
+              <li>Prepare test cases and test for enhancement user stories.</li>
+              <li>Manipulate Informix databases using DbVisualizer.</li>
+              <li>Test APIs using SoapUI and Postman.</li>
+              <li>Demonstrate the user story with expectations from the user.</li>
+            </ul>
+          </div>
+          <div class="project">
+            <h4>EasySalon</h4>
+            <ul>
+              <li>Use defect tracking tools such as JIRA and Bugzilla to track software defects.</li>
+              <li>Analyze user requirements and specifications to ensure software quality.</li>
+              <li>Understand requirements and prepare a test plan.</li>
+              <li>Test on staging and production environments.</li>
+              <li>Perform mobile testing on Android and iOS devices.</li>
+              <li>Manage bug reports using Jira.</li>
+            </ul>
+          </div>
+        </section>
+		
+        <!-- Skills -->
+        <section class="section skills">
+          <h3 class="section-title"><span class="icon-title">🛠</span>SKILLS</h3>
+          <ul class="skills-list">
+            <li>Playwright</li>
+            <li>Javascript</li>
+            <li>Typescript</li>
+            <li>HTML/CSS</li>
+            <li>MySQL</li>
+            <li>API Testing — REST APIs</li>
+            <li>Postman</li>
+            <li>Jira — Report, Tracking</li>
+            <li>Linux — Terminal, Deployment</li>
+            <li>Scrum</li>
+			<li>Xray</li>
+			<li>Android Studio</li>
+			<li>XCode</li>
+          </ul>
+        </section>
+
+        <!-- Certificates -->
+        <section class="section certificates">
+          <h3 class="section-title"><span class="icon-title">🎖</span>CERTIFICATES</h3>
+          <ul class="cert-list">
+            <li>ISTQB – Certified Tester</li>
+            <li>TOEIC – 850</li>
+          </ul>
+        </section>
+
+        <!-- Languages with progress bars -->
+        <section class="section languages">
+          <h3 class="section-title"><span class="icon-title">🌏</span>LANGUAGES</h3>
+          <div class="language-list">
+            <div class="language">
+              <span>English</span>
+              <div class="bar"><div class="fill" style="width: 80%;"></div></div>
+            </div>
+            <div class="language">
+              <span>Vietnamese</span>
+              <div class="bar"><div class="fill" style="width: 100%;"></div></div>
+            </div>
+          </div>
+        </section>
+		<!-- Courses -->
+        <section class="section courses">
+          <h3 class="section-title"><span class="icon-title">📚</span>COURSES</h3>
+          <ul class="course-list">
+            <li><strong>Playwright: Web Automation Testing From Zero to Hero</strong> – Udemy</li>
+            <li><strong>Playwright JS Automation Testing from Scratch with Framework</strong> – Udemy</li>
+          </ul>
+        </section>
+
+        <!-- Education -->
+        <section class="section education">
+          <h3 class="section-title"><span class="icon-title">🎓</span>EDUCATION</h3>
+          <div class="education-entry">
+            <div class="date">
+              <div>08/2014 – 07/2018</div>
+              <div>Da Nang, Viet Nam</div>
+            </div>
+            <div class="school">
+              <h4>Bachelor</h4>
+              <h5>Da Nang University Of Foreign Language</h5>
+            </div>
+          </div>
+        </section>
+      </div>
+
+    </div>
+
+    <!-- Toolbar: provides controls for printing.  Users can choose which
+         sections should be included in the printed document via the
+         checkboxes below.  The toolbar and its controls are hidden
+         automatically when printing.  -->
+    <div class="toolbar">
+      <div id="printOptions" class="print-options">
+        <strong>Chọn phần in:</strong>
+        <label><input type="checkbox" data-section="profile" checked /> Hồ sơ</label>
+        <label><input type="checkbox" data-section="experience" checked /> Kinh nghiệm</label>
+        <label><input type="checkbox" data-section="projects" checked /> Dự án</label>
+        <label><input type="checkbox" data-section="skills" checked /> Kỹ năng</label>
+        <label><input type="checkbox" data-section="certificates" checked /> Chứng chỉ</label>
+        <label><input type="checkbox" data-section="languages" checked /> Ngôn ngữ</label>
+        <label><input type="checkbox" data-section="courses" checked /> Khóa học</label>
+        <label><input type="checkbox" data-section="education" checked /> Học vấn</label>
+      </div>
+      <button id="downloadPDF">In ra PDF</button>
+    </div>
+
+    <!-- Include the behaviour script -->
+    <script src="script.js"></script>
+  </body>
+</html>

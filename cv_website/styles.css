@@ -1,0 +1,361 @@
+/*
+  Main stylesheet for the CV.  The design takes inspiration from the
+  supplied PDF: a dark blue header, clean typography and clear
+  separation of sections.  This file also contains print rules to
+  ensure the document looks correct when exported to PDF via
+  window.print().
+*/
+
+/* Colour palette */
+:root {
+  --primary-color: #243e75; /* deep navy similar to the PDF header */
+  --secondary-color: #f5f5f5; /* light grey for tags and backgrounds */
+  --text-color: #333333;
+  --accent-color: #3b5998; /* used for borders/tags */
+}
+
+/* Basic reset */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Segoe UI", Tahoma, sans-serif;
+  color: var(--text-color);
+  background: white;
+  line-height: 1.4;
+}
+
+/* CV container sized for A4 portrait.  When printing the page,
+   browsers will break after each `.page` automatically thanks
+   to the `page-break-after: always` rule below. */
+#cv {
+  width: 210mm;
+  margin: auto;
+  background: white;
+}
+
+/* Each page is separated when printing. */
+.page {
+  padding-bottom: 20mm;
+  page-break-after: always;
+}
+
+/* Last page should not force an extra blank page. */
+.page:last-of-type {
+  page-break-after: auto;
+}
+
+/* Header styling */
+.header {
+  background: var(--primary-color);
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  padding: 20px 25px;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+}
+
+.header-left .name {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 700;
+}
+
+.header-left .role {
+  margin: 4px 0 12px;
+  font-size: 18px;
+  font-weight: 400;
+  opacity: 0.9;
+}
+
+.contact {
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  gap: 8px 16px;
+  align-items: center;
+}
+
+.contact-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+}
+
+.contact-item .icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: white;
+  color: var(--primary-color);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* Avatar wrapper.  The input covers the image so that clicking on
+   the picture opens the file dialog. */
+.avatar-wrapper {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.avatar-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.avatar-wrapper input[type="file"] {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* Section styling */
+.section {
+  padding: 10px 25px;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--primary-color);
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  margin-block-start:10px;
+  border-bottom: 2px solid var(--primary-color);
+  padding-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.icon-title {
+  font-size: 16px;
+}
+
+/* Job entries in Professional Experience */
+.job {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 16px;
+}
+
+.job .date {
+  width: 150px;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--primary-color);
+}
+
+.job .company h4 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+.job .company h5 {
+  margin: 2px 0 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #555;
+}
+
+.job ul {
+  margin: 0;
+  padding-left: 18px;
+  list-style: disc;
+}
+
+.job ul li {
+  margin-bottom: 4px;
+  font-size: 14px;
+}
+
+/* Projects list styling */
+.project h4 {
+  margin: 12px 0 4px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+.project ul {
+  margin: 0;
+  padding-left: 18px;
+  list-style: disc;
+  font-size: 14px;
+}
+
+.project ul li {
+  margin-bottom: 4px;
+}
+
+/* Skills tags */
+.skills-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.skills-list li {
+  border: 1px solid var(--primary-color);
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 13px;
+  background: var(--secondary-color);
+  color: var(--primary-color);
+}
+
+/* Certificate and course lists */
+.cert-list,
+.course-list {
+  list-style: disc;
+  padding-left: 20px;
+  margin: 0;
+  font-size: 14px;
+}
+
+/* Languages progress bars */
+
+/* Languages section */
+/* Display multiple languages side by side */
+.languages .language-list {
+  display: flex;
+  gap: 20px;
+}
+
+/* Each language block grows equally */
+.languages .language {
+  flex: 1;
+  font-size: 14px;
+}
+
+.languages .language span {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+.languages .bar {
+  width: 100%;
+  height: 8px;
+  background: #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.languages .bar .fill {
+  height: 100%;
+  background: var(--primary-color);
+}
+
+/* Education entry layout */
+.education-entry {
+  display: flex;
+  gap: 20px;
+}
+
+.education-entry .date {
+  width: 150px;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--primary-color);
+}
+
+.education-entry .school h4 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+.education-entry .school h5 {
+  margin: 2px 0 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #555;
+}
+
+/* Toolbar styling */
+.toolbar {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.toolbar button {
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.toolbar button:hover {
+  background: #1f3460;
+}
+
+/* Print options styling */
+.print-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.print-options label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+}
+
+/* Hide print options when printing */
+@media print {
+  .print-options {
+    display: none;
+  }
+}
+
+/* Hide the toolbar and file input when printing */
+@media print {
+  .toolbar {
+    display: none;
+  }
+  .avatar-wrapper input[type="file"] {
+    display: none;
+  }
+
+  /* Hide any element marked as print-hide when printing */
+  .print-hide {
+    display: none !important;
+  }
+}
