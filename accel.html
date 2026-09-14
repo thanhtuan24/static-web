@@ -334,6 +334,7 @@ button.btn:disabled{opacity:.45;cursor:not-allowed}
 .stat{flex:1;min-width:90px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px;text-align:center}
 .stat b{display:block;font-size:22px;color:var(--acc)}
 .stat span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+#docLibrary{background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:10px}.docrow{display:grid;grid-template-columns:1fr auto;gap:8px;padding:8px;border-bottom:1px solid var(--line)}.docrow:last-child{border:0}.docTocBtn{display:block;width:100%;text-align:left;background:transparent;color:var(--muted);border:0;padding:3px;cursor:pointer}.docTocBtn:hover{color:var(--acc)}
 #reader{max-height:60vh;overflow:auto;padding:8px 14px;background:var(--bg);border:1px solid var(--line);border-radius:8px}
 #reader code{background:#22272e;padding:1px 5px;border-radius:4px}
 #reader pre{background:#22272e;padding:10px;border-radius:8px;overflow:auto}#reader .frontmatter{border-left:3px solid var(--vio);color:var(--muted);white-space:pre-wrap}#reader h1,#reader h2,#reader h3{color:var(--txt);margin-top:1.1em}#reader p,#reader li,#reader blockquote{line-height:1.75}
@@ -404,13 +405,15 @@ kbd{background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:
 <div class="card">
 <div class="row" style="margin-bottom:10px">
 <button class="btn" id="btnStart">▶ Bắt đầu đọc</button>
+<label class="btn sec" style="margin:0">📂 Mở file<input id="docFile" type="file" accept=".md,.markdown,.txt,.pdf,.epub,text/markdown,text/plain,application/pdf,application/epub+zip" hidden></label>
+<button class="btn sec" id="docLibraryBtn">▤ Thư viện</button>
 <button class="btn sec" disabled="" id="btnPause">⏸ Tạm dừng</button>
 <button class="btn sec" disabled="" id="btnDone">■ Hoàn thành</button>
 <button class="btn sec" id="btnEdit">✎ Sửa văn bản</button>
 <span class="note" id="timer">00:00.0</span>
 </div><div id="resumeBox" class="note" style="display:none;margin:8px 0;padding:8px;border:1px solid var(--line);border-radius:8px"></div>
-<textarea id="src" placeholder="Dán văn bản Markdown vào đây..."></textarea>
-<div id="reader" style="display:none"></div>
+<div id="docStatus" class="note" style="margin:7px 0"></div><div id="docToc" style="display:none;margin-bottom:8px"></div><textarea id="src" placeholder="Dán Markdown hoặc mở file .md, .txt, .pdf, .epub..."></textarea>
+<div id="docLibrary" style="display:none;margin-bottom:10px"></div><div id="reader" style="display:none"></div>
 <div id="rsvp"><div><div id="rsvpWord">—</div><div class="note" id="rsvpPos" style="margin-top:14px"></div></div></div>
 <div class="bar"><i id="prog"></i></div>
 <div class="stats">
@@ -1122,6 +1125,11 @@ function initReadingLab(){
 const pillMode=root.getElementById("pillMode");
 const pillWpm=root.getElementById("pillWpm");
 const btnStart=root.getElementById("btnStart");
+const docFile=root.getElementById("docFile");
+const docLibraryBtn=root.getElementById("docLibraryBtn");
+const docStatus=root.getElementById("docStatus");
+const docToc=root.getElementById("docToc");
+const docLibrary=root.getElementById("docLibrary");
 const btnPause=root.getElementById("btnPause");
 const btnDone=root.getElementById("btnDone");
 const btnEdit=root.getElementById("btnEdit");
@@ -1569,10 +1577,25 @@ function setChunk(n){
   if(CFG.mode==='rsvp'&&S.running){const at=S.CH[S.ci]?S.CH[S.ci].i:0;S.CH=buildChunks(S.W);
     S.ci=Math.max(0,S.CH.findIndex(c=>c.i+c.w.length>at));clearTimeout(S.rt);rsvpLoop()}}
 
+/* ========== Learning Document Hub ========== */
+let ACTIVE_DOC=null,DOCS=[];
+const DocDB=(()=>{let db;function open(){return new Promise((ok,no)=>{const r=indexedDB.open('accel_library',1);r.onupgradeneeded=()=>{const d=r.result;if(!d.objectStoreNames.contains('documents'))d.createObjectStore('documents',{keyPath:'id'});if(!d.objectStoreNames.contains('files'))d.createObjectStore('files')};r.onsuccess=()=>{db=r.result;ok()};r.onerror=()=>no(r.error)})}function tx(st,m='readonly'){return db.transaction(st,m).objectStore(st)}function put(st,v,k){return new Promise((ok,no)=>{const r=k===undefined?tx(st,'readwrite').put(v):tx(st,'readwrite').put(v,k);r.onsuccess=()=>ok();r.onerror=()=>no(r.error)})}function get(st,k){return new Promise((ok,no)=>{const r=tx(st).get(k);r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)})}function all(st){return new Promise((ok,no)=>{const r=tx(st).getAll();r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)})}function del(st,k){return new Promise((ok,no)=>{const r=tx(st,'readwrite').delete(k);r.onsuccess=()=>ok();r.onerror=()=>no(r.error)})}return{open,put,get,all,del}})();
+const docId=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+function htmlToMarkdown(html){const d=new DOMParser().parseFromString(html,'text/html');d.querySelectorAll('script,style,noscript,svg').forEach(x=>x.remove());d.querySelectorAll('h1,h2,h3,h4,h5,h6').forEach(x=>x.replaceWith('\n'+'#'.repeat(+x.tagName[1])+' '+x.textContent.trim()+'\n'));d.querySelectorAll('li').forEach(x=>x.prepend('- '));d.querySelectorAll('br').forEach(x=>x.replaceWith('\n'));d.querySelectorAll('p,div,section,article,blockquote,li').forEach(x=>x.append('\n'));return d.body.textContent.replace(/\n{3,}/g,'\n\n').trim()}
+function buildToc(md){return md.split('\n').map((x,i)=>{const m=x.match(/^(#{1,6})\s+(.+)/);return m?{level:m[1].length,title:m[2],line:i}:null}).filter(Boolean)}
+async function loadPdf(file){docStatus.textContent='Đang nạp PDF.js và trích xuất từng trang…';const pdfjs=await import('https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.min.mjs');pdfjs.GlobalWorkerOptions.workerSrc='https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.worker.min.mjs';const pdf=await pdfjs.getDocument({data:await file.arrayBuffer()}).promise;let parts=[];for(let i=1;i<=pdf.numPages;i++){const page=await pdf.getPage(i),tc=await page.getTextContent(),txt=tc.items.map(x=>x.str).join(' ').replace(/\s+/g,' ').trim();parts.push(`## Trang ${i}\n\n${txt}`);docStatus.textContent=`Đang đọc PDF: ${i}/${pdf.numPages} trang`;if(i%8===0)await new Promise(r=>setTimeout(r,0))}return{md:`# ${file.name.replace(/\.pdf$/i,'')}\n\n`+parts.join('\n\n'),sections:pdf.numPages,kind:'pdf'}}
+function loadScript(url,key){if(window[key])return Promise.resolve();return new Promise((ok,no)=>{const x=document.createElement('script');x.src=url;x.onload=ok;x.onerror=no;document.head.appendChild(x)})}
+async function loadEpub(file){docStatus.textContent='Đang nạp EPUB.js và giải nén sách…';await loadScript('https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js','JSZip');await loadScript('https://cdn.jsdelivr.net/npm/epubjs@0.3.93/dist/epub.min.js','ePub');const book=window.ePub(await file.arrayBuffer());await book.ready;const meta=await book.loaded.metadata;let out=[],n=0;for(const item of book.spine.spineItems){const section=book.section(item.href);const html=await section.render();const md=htmlToMarkdown(html);if(md){n++;out.push(`## ${item.idref||'Chương '+n}\n\n${md}`)}section.unload();docStatus.textContent=`Đang đọc EPUB: ${n} phần`;await new Promise(r=>setTimeout(r,0))}book.destroy();return{md:`# ${meta.title||file.name.replace(/\.epub$/i,'')}\n\n`+out.join('\n\n'),sections:n,kind:'epub'}}
+async function importDocument(file){try{docStatus.textContent='Đang mở '+file.name+'…';const ext=file.name.split('.').pop().toLowerCase();let r;if(['md','markdown','txt'].includes(ext)){r={md:await file.text(),sections:0,kind:ext==='txt'?'text':'markdown'}}else if(ext==='pdf')r=await loadPdf(file);else if(ext==='epub')r=await loadEpub(file);else throw Error('Định dạng chưa hỗ trợ');const id=docId(),toc=buildToc(r.md),rec={id,title:(toc[0]?.title||file.name),fileName:file.name,format:r.kind,size:file.size,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),totalWords:countWords(r.md).length,currentWord:0,readUntil:0,toc,sections:r.sections||toc.length,cachedText:r.md};await DocDB.put('documents',rec);await DocDB.put('files',file,id);DOCS=await DocDB.all('documents');ACTIVE_DOC=rec;src.value=r.md;updateWC();renderDocToc(rec);renderLibrary();docStatus.textContent=`✔ ${rec.title} · ${rec.totalWords.toLocaleString('vi-VN')} từ · ${rec.sections} phần`;clearReadingResume()}catch(e){docStatus.textContent='✖ '+e.message;console.error(e)}}
+function renderDocToc(rec){const toc=rec?.toc||buildToc(src.value);if(!toc.length){docToc.style.display='none';return}docToc.style.display='block';docToc.innerHTML='<details><summary>Mục lục · '+toc.length+' mục</summary>'+toc.slice(0,300).map(x=>`<button class="docTocBtn" data-line="${x.line}" style="padding-left:${x.level*10}px">${esc(x.title)}</button>`).join('')+'</details>';docToc.querySelectorAll('[data-line]').forEach(b=>b.onclick=()=>{const lines=src.value.split('\n'),before=lines.slice(0,+b.dataset.line).join('\n');const wi=countWords(before).length;if(S.running&&S.VCH?.length){pc=Math.max(0,S.VCH.findIndex(c=>c.i+c.w.length>wi));pi=wi;if(S.virtual)renderVirtualWindow(wi,true);if(!S.paused)pacerLoop()}else{src.focus();src.setSelectionRange(before.length,before.length)}})}
+async function renderLibrary(){if(!DOCS.length)DOCS=await DocDB.all('documents');docLibrary.innerHTML=DOCS.length?DOCS.sort((a,b)=>String(b.updatedAt).localeCompare(a.updatedAt)).map(d=>`<div class="docrow"><span><b>${esc(d.title)}</b><small class="note">${d.format.toUpperCase()} · ${(d.totalWords||0).toLocaleString('vi-VN')} từ · ${Math.round((d.currentWord||0)/Math.max(1,d.totalWords||1)*100)}%</small></span><span><button class="btn sec sm" data-open="${d.id}">Mở</button><button class="btn dgr sm" data-del="${d.id}">Xóa</button></span></div>`).join(''):'<div class="note">Thư viện trống. Chọn file Markdown, PDF hoặc EPUB.</div>';docLibrary.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>openDocument(b.dataset.open));docLibrary.querySelectorAll('[data-del]').forEach(b=>b.onclick=async()=>{if(!confirm('Xóa tài liệu khỏi thư viện local?'))return;await DocDB.del('documents',b.dataset.del);await DocDB.del('files',b.dataset.del);DOCS=DOCS.filter(x=>x.id!==b.dataset.del);renderLibrary()})}
+async function openDocument(id){const d=await DocDB.get('documents',id);if(!d)return;ACTIVE_DOC=d;let md=d.cachedText;if(!md){const f=await DocDB.get('files',id);if(!f){docStatus.textContent='Không tìm thấy file gốc';return}await importDocument(f);return}src.value=md;renderDocToc(d);updateWC();docStatus.textContent=`✔ ${d.title} · vị trí ${d.currentWord||0}/${d.totalWords||0}`}
+docFile.onchange=()=>{const f=docFile.files[0];if(f)importDocument(f);docFile.value=''};docLibraryBtn.onclick=async()=>{docLibrary.style.display=docLibrary.style.display==='block'?'none':'block';if(docLibrary.style.display==='block')await renderLibrary()};
+
 /* ========== Reading resume persistence ========== */
 const RESUME_KEY='mdrt_resume_v2';
 function textFingerprint(t){let h=2166136261;for(let i=0;i<t.length;i+=Math.max(1,Math.floor(t.length/5000))){h^=t.charCodeAt(i);h=Math.imul(h,16777619)}return (h>>>0).toString(36)+'-'+t.length}
-function saveReadingResume(force=false){if(!S.running)return;const now=Date.now();if(!force&&now-S.resumeSaveAt<3000)return;S.resumeSaveAt=now;const idx=CFG.mode==='rsvp'?(S.CH[Math.max(0,S.ci-1)]?.i||0):(S.VCH[Math.max(0,pc-1)]?.i||pi||0);const activeMs=Math.max(0,performance.now()-S.t0-S.pausedTotal-(S.paused&&S.pausedAt?performance.now()-S.pausedAt:0));const data={v:2,savedAt:new Date().toISOString(),text:src.value,fingerprint:textFingerprint(src.value),wordIndex:idx,readUntil:Math.max(S.readUntil||0,idx),activeMs,mode:CFG.mode,wpm:CFG.wpm,chunk:CFG.chunk,smart:CFG.smart,virtual:S.virtual};try{localStorage.setItem(RESUME_KEY,JSON.stringify(data));showResumeOffer()}catch(e){console.warn('resume save',e)}}
+function saveReadingResume(force=false){if(!S.running)return;const now=Date.now();if(!force&&now-S.resumeSaveAt<3000)return;S.resumeSaveAt=now;const idx=CFG.mode==='rsvp'?(S.CH[Math.max(0,S.ci-1)]?.i||0):(S.VCH[Math.max(0,pc-1)]?.i||pi||0);const activeMs=Math.max(0,performance.now()-S.t0-S.pausedTotal-(S.paused&&S.pausedAt?performance.now()-S.pausedAt:0));const data={v:2,savedAt:new Date().toISOString(),text:src.value,fingerprint:textFingerprint(src.value),wordIndex:idx,readUntil:Math.max(S.readUntil||0,idx),activeMs,mode:CFG.mode,wpm:CFG.wpm,chunk:CFG.chunk,smart:CFG.smart,virtual:S.virtual};try{localStorage.setItem(RESUME_KEY,JSON.stringify(data));if(ACTIVE_DOC){ACTIVE_DOC.currentWord=idx;ACTIVE_DOC.readUntil=data.readUntil;ACTIVE_DOC.updatedAt=data.savedAt;DocDB.put('documents',ACTIVE_DOC)}showResumeOffer()}catch(e){console.warn('resume save',e)}}
 function clearReadingResume(){localStorage.removeItem(RESUME_KEY);resumeBox.style.display='none';resumeBox.innerHTML=''}
 function getReadingResume(){try{return JSON.parse(localStorage.getItem(RESUME_KEY)||'null')}catch(e){return null}}
 function showResumeOffer(){const r=getReadingResume();if(!r||!r.text)return;const pct=r.text?Math.round((r.wordIndex/Math.max(1,countWords(r.text).length))*100):0;resumeBox.style.display='block';resumeBox.innerHTML=`Có phiên đọc đã lưu: <b>${pct}%</b> · từ ${r.wordIndex+1} · lưu ${new Date(r.savedAt).toLocaleString('vi-VN')} <button class="btn sm" id="resumeGo">▶ Tiếp tục</button> <button class="btn sec sm" id="resumeDiscard">Bỏ</button>`;root.getElementById('resumeGo').onclick=()=>resumeReading(r);root.getElementById('resumeDiscard').onclick=clearReadingResume}
@@ -1854,7 +1877,7 @@ $('#fileCfg').onchange=e=>{const f=e.target.files[0],r=new FileReader();
   r.readAsText(f)};
 
 src.value=`# Kỹ thuật đọc nhanh\n\nĐọc nhanh không phải là lướt qua chữ mà là **giảm số lần dừng mắt** trên mỗi dòng. Người đọc thông thường dừng mắt 4-6 lần mỗi dòng; người được luyện tập chỉ cần 2-3 lần.\n\n## Ba thói quen cần bỏ\n\n1. Đọc thầm trong đầu (subvocalization) — giới hạn tốc độ ở mức nói chuyện, khoảng 200 WPM.\n2. Đọc giật lùi (regression) — quay lại đoạn vừa đọc vì thiếu tập trung.\n3. Đọc từng từ thay vì theo cụm từ.\n\n> Mục tiêu hợp lý: 400-600 WPM với độ hiểu trên 70%.\n\nChỉ số quan trọng nhất không phải WPM thuần mà là **WPM hiệu quả** = tốc độ nhân độ hiểu.`;
-paintSwatches();loadLex();loadProv();applyCfg();updateWC();showResumeOffer();
+paintSwatches();loadLex();loadProv();applyCfg();updateWC();showResumeOffer();DocDB.open().then(async()=>{DOCS=await DocDB.all('documents');renderLibrary()}).catch(e=>docStatus.textContent='Library DB lỗi: '+e.message);
 
   RL_OPEN_TAB=tab=>{const b=[...root.querySelectorAll('nav button')].find(x=>x.dataset.t===tab);if(b)b.click()};
   RL_READY=true;
