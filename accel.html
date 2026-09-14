@@ -1484,7 +1484,7 @@ const DEF={wpm:300,stepLR:10,stepUD:50,idleAdjust:false,mode:'visual',chunk:3,sm
   hlBg:'#4f9cf9',hlTx:'#06121f',piv:'#ff5f5f',done:'#5c6773',blk:'#4f9cf9',blkA:10,
   n:5,type:'mc',exCode:true,exTable:false,exQuote:false,cjk:true};
 let CFG=Object.assign({},DEF,JSON.parse(localStorage.getItem('mdrt_cfg')||'{}'));
-let S={running:false,paused:false,t0:0,pausedAt:0,pausedTotal:0,tick:null,W:[],CH:[],ci:0,rt:null,last:null,quiz:null,answers:{},VCH:[],light:false,virtual:false,vStart:0,vEnd:0,vSize:1400,vMargin:250,_lastChunk:null,readUntil:0,currentChunk:null,resumeSaveAt:0};
+let S={running:false,paused:false,t0:0,pausedAt:0,pausedTotal:0,tick:null,W:[],CH:[],ci:0,rt:null,last:null,quiz:null,answers:{},VCH:[],light:false,virtual:false,vStart:0,vEnd:0,vSize:5200,vMargin:250,_lastChunk:null,readUntil:0,currentChunk:null,resumeSaveAt:0};
 const PRESETS=[['#4f9cf9','#06121f','#ff5f5f','Xanh cổ điển'],['#ffd43b','#1a1400','#ff6b6b','Vàng highlighter'],
   ['#3fb950','#04140a','#ffa94d','Xanh lá'],['#f783ac','#2b0a16','#74c0fc','Hồng'],
   ['#ff922b','#1f0d00','#4dabf7','Cam'],['#e6edf3','#0f1216','#4f9cf9','Đơn sắc']];
@@ -1589,7 +1589,7 @@ $('#btnStart').onclick=async()=>{
   S.CH=buildChunks(S.W);S.ci=0;S.vBlocks=null;S.paused=false;S.pausedAt=0;S.pausedTotal=0;
   S.light=false;
   if(CFG.mode==='rsvp'){reader.style.display='none';rsvp.classList.add('on')}
-  else{rsvp.classList.remove('on');reader.style.display='';S.virtual=CFG.hl==='word'&&S.W.length>12000;reader.innerHTML=S.virtual?'':mdRender(md);await new Promise(r=>requestAnimationFrame(r));prepReader();}
+  else{rsvp.classList.remove('on');reader.style.display='';S.virtual=CFG.hl==='word'&&S.W.length>60000;reader.innerHTML=S.virtual?'':mdRender(md);await new Promise(r=>requestAnimationFrame(r));prepReader();}
   S.running=true;S.t0=performance.now();musicPlay('read');btnStart.textContent='▶ Đang đọc';btnPause.disabled=false;btnPause.textContent='⏸ Tạm dừng';btnDone.disabled=false;
   if(CFG.mode==='rsvp')rsvpLoop();else if(CFG.hl!=='off'||CFG.blur!=='off')pacerLoop();
   S.tick=setInterval(()=>{if(!S.paused)timer.textContent=fmt(performance.now()-S.t0-S.pausedTotal);saveReadingResume(false)},250)};
