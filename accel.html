@@ -405,6 +405,7 @@ kbd{background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:
 <div class="card">
 <div class="row" style="margin-bottom:10px">
 <button class="btn" id="btnStart">▶ Bắt đầu đọc</button>
+<button class="btn sec" disabled="" id="btnPause">⏸ Tạm dừng</button>
 <button class="btn sec" disabled="" id="btnDone">■ Hoàn thành</button>
 <button class="btn sec" id="btnEdit">✎ Sửa văn bản</button>
 <span class="note" id="timer">00:00.0</span>
@@ -1103,12 +1104,14 @@ function initReadingLab(){
     querySelector:s=>root.querySelector(s),querySelectorAll:s=>root.querySelectorAll(s),
     getElementById:id=>root.getElementById(id),createElement:(...x)=>realDocument.createElement(...x),
     createDocumentFragment:(...x)=>realDocument.createDocumentFragment(...x),
+    createTextNode:(...x)=>realDocument.createTextNode(...x),
     createTreeWalker:(...x)=>realDocument.createTreeWalker(...x),documentElement:host
   };
   const $=s=>root.querySelector(s),$$=s=>[...root.querySelectorAll(s)];
 const pillMode=root.getElementById("pillMode");
 const pillWpm=root.getElementById("pillWpm");
 const btnStart=root.getElementById("btnStart");
+const btnPause=root.getElementById("btnPause");
 const btnDone=root.getElementById("btnDone");
 const btnEdit=root.getElementById("btnEdit");
 const timer=root.getElementById("timer");
@@ -1468,7 +1471,7 @@ const DEF={wpm:300,stepLR:10,stepUD:50,idleAdjust:false,mode:'visual',chunk:3,sm
   hlBg:'#4f9cf9',hlTx:'#06121f',piv:'#ff5f5f',done:'#5c6773',blk:'#4f9cf9',blkA:10,
   n:5,type:'mc',exCode:true,exTable:false,exQuote:false,cjk:true};
 let CFG=Object.assign({},DEF,JSON.parse(localStorage.getItem('mdrt_cfg')||'{}'));
-let S={running:false,paused:false,t0:0,tick:null,W:[],CH:[],ci:0,rt:null,last:null,quiz:null,answers:{},VCH:[]};
+let S={running:false,paused:false,t0:0,pausedAt:0,pausedTotal:0,tick:null,W:[],CH:[],ci:0,rt:null,last:null,quiz:null,answers:{},VCH:[],light:false};
 const PRESETS=[['#4f9cf9','#06121f','#ff5f5f','Xanh cổ điển'],['#ffd43b','#1a1400','#ff6b6b','Vàng highlighter'],
   ['#3fb950','#04140a','#ffa94d','Xanh lá'],['#f783ac','#2b0a16','#74c0fc','Hồng'],
   ['#ff922b','#1f0d00','#4dabf7','Cam'],['#e6edf3','#0f1216','#4f9cf9','Đơn sắc']];
@@ -1556,17 +1559,22 @@ function setChunk(n){
 /* ========== Session ========== */
 function fmt(ms){const s=ms/1000;return String(Math.floor(s/60)).padStart(2,'0')+':'+(s%60).toFixed(1).padStart(4,'0')}
 $('#btnEdit').onclick=()=>{stopAll();src.style.display='';reader.style.display='none';rsvp.classList.remove('on');hud.classList.remove('on')};
-$('#btnStart').onclick=()=>{
+$('#btnStart').onclick=async()=>{
   const md=src.value.trim();if(!md){alert('Hãy dán văn bản Markdown trước.');return}
-  S.W=countWords(md);if(!S.W.length){alert('Không tìm thấy từ nào.');return}
+  btnStart.disabled=true;btnStart.textContent='Đang chuẩn bị…';await new Promise(r=>setTimeout(r,0));
+  S.W=countWords(md);if(!S.W.length){alert('Không tìm thấy từ nào.');btnStart.disabled=false;btnStart.textContent='▶ Bắt đầu đọc';return}
   sWords.textContent=S.W.length;sComp.textContent='—';src.style.display='none';
-  S.CH=buildChunks(S.W);S.ci=0;S.paused=false;
-  if(CFG.mode==='rsvp'){reader.style.display='none';rsvp.classList.add('on');rsvpLoop()}
-  else{rsvp.classList.remove('on');reader.style.display='';reader.innerHTML=mdRender(md);prepReader();
-       if(CFG.hl!=='off'||CFG.blur!=='off')pacerLoop()}
-  S.running=true;S.t0=performance.now();btnStart.disabled=true;btnDone.disabled=false;
-  S.tick=setInterval(()=>{if(!S.paused)timer.textContent=fmt(performance.now()-S.t0)},100)};
+  S.CH=buildChunks(S.W);S.ci=0;S.paused=false;S.pausedAt=0;S.pausedTotal=0;
+  S.light=S.W.length>12000;
+  if(CFG.mode==='rsvp'){reader.style.display='none';rsvp.classList.add('on')}
+  else{rsvp.classList.remove('on');reader.style.display='';reader.innerHTML=mdRender(md);await new Promise(r=>requestAnimationFrame(r));prepReader();}
+  S.running=true;S.t0=performance.now();btnStart.textContent='▶ Đang đọc';btnPause.disabled=false;btnPause.textContent='⏸ Tạm dừng';btnDone.disabled=false;
+  if(CFG.mode==='rsvp')rsvpLoop();else if(CFG.hl!=='off'||CFG.blur!=='off')pacerLoop();
+  S.tick=setInterval(()=>{if(!S.paused)timer.textContent=fmt(performance.now()-S.t0-S.pausedTotal)},250)};
 $('#btnDone').onclick=finish;
+function toggleReadingPause(){if(!S.running)return;S.paused=!S.paused;if(S.paused){S.pausedAt=performance.now();btnPause.textContent='▶ Tiếp tục';pillMode.textContent='⏸ Tạm dừng'}else{if(S.pausedAt)S.pausedTotal+=performance.now()-S.pausedAt;S.pausedAt=0;btnPause.textContent='⏸ Tạm dừng';pillMode.textContent=CFG.mode==='rsvp'?'RSVP · chunk '+CFG.chunk:'Trực quan';if(CFG.mode==='rsvp'){clearTimeout(S.rt);rsvpLoop()}else if(CFG.hl!=='off'||CFG.blur!=='off'){clearTimeout(S.rt);pacerLoop()}}}
+btnPause.onclick=toggleReadingPause;
+
 function rsvpLoop(){
   clearTimeout(S.rt);
   const go=()=>{
@@ -1586,15 +1594,16 @@ function prepReader(){
   if(CFG.hlStyle!=='fill')reader.classList.add('hl-'+CFG.hlStyle);
   if(CFG.dim)reader.classList.add('dim');
   BL=[...reader.children];BL.forEach(b=>b.classList.add('blk','ahead'));
-  if(CFG.hl==='word'){
+  if(CFG.hl==='word'&&!S.light){
     const wk=rlDocument.createTreeWalker(reader,NodeFilter.SHOW_TEXT),ns=[];
     while(wk.nextNode())if(wk.currentNode.nodeValue.trim())ns.push(wk.currentNode);
     ns.forEach(n=>{const f=rlDocument.createDocumentFragment();
       n.nodeValue.split(/(\s+)/).forEach(p=>{if(/^\s*$/.test(p)){f.appendChild(rlDocument.createTextNode(p));return}
         const w=rlDocument.createElement('w');w.textContent=p;f.appendChild(w)});
       n.parentNode.replaceChild(f,n)})}
-  WD=[...reader.querySelectorAll('w')];pi=0;pc=0;
-  if(CFG.hl==='word')S.VCH=buildChunks(WD.map(e=>e.textContent))}
+  WD=S.light?[]:[...reader.querySelectorAll('w')];pi=0;pc=0;
+  if(CFG.hl==='word'&&!S.light)S.VCH=buildChunks(WD.map(e=>e.textContent));
+  if(S.light&&CFG.hl==='word')pillMode.textContent='Trực quan · chế độ nhẹ ('+S.W.length+' từ)'}
 function paintBlocks(k){BL.forEach((b,i)=>{b.classList.remove('cur','ahead','behind');b.classList.add(i<k?'behind':i>k?'ahead':'cur')})}
 function pacerLoop(){
   clearTimeout(S.rt);
@@ -1603,8 +1612,8 @@ function pacerLoop(){
     const go=()=>{if(S.paused){S.rt=setTimeout(go,100);return}
       if(pc>=CHV.length){paintBlocks(BL.length-1);return}
       const c=CHV[pc];
-      WD.forEach((w,i)=>w.className=i<c.i?'done':'');
-      for(let k=c.i;k<c.i+c.w.length&&k<WD.length;k++)WD[k].className='now';
+      if(S._lastWord!=null)for(let k=S._lastWord;k<c.i&&k<WD.length;k++)WD[k].className='done';
+      for(let k=c.i;k<c.i+c.w.length&&k<WD.length;k++)WD[k].className='now';S._lastWord=c.i+c.w.length;
       const cur=WD[c.i],b=BL.findIndex(x=>x.contains(cur));if(b>-1)paintBlocks(b);
       if(CFG.scroll&&cur)cur.scrollIntoView({block:'center',behavior:'smooth'});
       prog.style.width=(c.i/WD.length*100)+'%';pi=c.i;pc++;
@@ -1618,10 +1627,10 @@ function seek(d){
   if(CFG.mode==='rsvp'){S.ci=Math.max(0,Math.min(S.CH.length-1,S.ci+d));clearTimeout(S.rt);rsvpLoop()}
   else if(CFG.hl==='word'){pc=Math.max(0,pc+d);clearTimeout(S.rt);pacerLoop()}
   else{pi=Math.max(0,pi+d);clearTimeout(S.rt);pacerLoop()}}
-function stopAll(){clearInterval(S.tick);clearTimeout(S.rt);S.running=false;btnStart.disabled=false;btnDone.disabled=true}
+function stopAll(){clearInterval(S.tick);clearTimeout(S.rt);S.running=false;S.paused=false;btnStart.disabled=false;btnStart.textContent='▶ Bắt đầu đọc';btnPause.disabled=true;btnPause.textContent='⏸ Tạm dừng';btnDone.disabled=true}
 function finish(){
   if(!S.running)return;
-  const ms=performance.now()-S.t0;stopAll();prog.style.width='100%';hud.classList.remove('on');
+  const now=performance.now(),extraPause=S.paused&&S.pausedAt?now-S.pausedAt:0,ms=Math.max(1,now-S.t0-S.pausedTotal-extraPause);stopAll();prog.style.width='100%';hud.classList.remove('on');
   const n=S.W.length,wpm=Math.round(n/(ms/60000));
   sTime.textContent=(ms/1000).toFixed(1)+'s';sWpm.textContent=wpm;timer.textContent=fmt(ms);
   const t=(src.value.match(/^#{1,6}\s+(.+)/m)||[,plainText(src.value).slice(0,40)])[1];
@@ -1637,7 +1646,7 @@ addEventListener('keydown',e=>{
   if(e.key==='ArrowDown'&&live){e.preventDefault();bump(-CFG.stepUD,e);return}
   if(/^[0-9]$/.test(e.key)&&live){e.preventDefault();setChunk(e.key==='0'?10:+e.key);return}
   if(!S.running)return;
-  if(e.code==='Space'){e.preventDefault();S.paused=!S.paused;pillMode.textContent=S.paused?'⏸ Tạm dừng':(CFG.mode==='rsvp'?'RSVP · chunk '+CFG.chunk:'Trực quan')}
+  if(e.code==='Space'){e.preventDefault();toggleReadingPause()}
   if(e.key===','){e.preventDefault();seek(-1)}
   if(e.key==='.'){e.preventDefault();seek(1)}
   if(e.key==='Escape')finish()});
